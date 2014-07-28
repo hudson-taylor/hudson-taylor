@@ -7,6 +7,7 @@
   },
   "author": "Pomke",
   "license": "MIT",
+  "repository" : "git@github.com:pomke/hudson-taylor.git",
   "dependencies": {
     "json-rpc2" : "0.6.0"
   }
