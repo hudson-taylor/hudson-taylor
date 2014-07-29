@@ -49,7 +49,7 @@ Services are simply a setup function which takes a Service object with an 'on'
 method, and a ready callback. You will use 's.on' to register APIs, 'on' takes
 a 'signal' (API end-point), a 'schema' for validating input, and your handler.
 
-"""TIP:""", Extra arguments passed to server.add above will be passed to your
+TIP: Extra arguments passed to server.add above will be passed to your
 service setup function, this is handy for passing in database connections, 
 config and other helpers.
 
@@ -78,6 +78,37 @@ s.remote("myService", "echo", {input : "Hello World!", function(err, res) {
 });
 ```
 
+
+
+## Single-process quick-start:
+
+This lets you get up and running without client/server, just one process to 
+start with:
+
+### myservice.js
+
+```javascript
+exports.setup = function(s, ready, db, config, logger) {
+
+    s.on("echo", s.Object({input : s.String({min:3})}), function(data, callback) {
+        logger.log("woo!");
+        callback(null, data.input);
+    });
+
+    ready(); 
+}
+```
+
+### index.js
+
+```javascript
+var s = ht.Services();
+s.connect("myService", ht.LocalService("myService", myservice.setup, db, config, logger));
+
+s.remote("myService", "echo", {input : "Hello World!", function(err, res) { 
+    // Do things with the response here! 
+});
+```
 
 
 # The details:
@@ -179,7 +210,7 @@ An array validator which can only contain Dates.
 ```
 An optional array validator which can contain cats and dogs.
 
-'''Note:''', Array validators match in precidence left to right.
+Note: Array validators match in precidence left to right.
 ```javascript
     var catSchema = s.Object({ 
         name : s.String(), 
