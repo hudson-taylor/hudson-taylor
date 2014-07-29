@@ -3,12 +3,15 @@
   "version": "0.0.1",
   "description": "Library for building services.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter spec --bail --check-leaks test/"
   },
   "author": "Pomke",
   "license": "MIT",
   "repository" : "git@github.com:pomke/hudson-taylor.git",
   "dependencies": {
     "json-rpc2" : "0.6.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.21.0"
   }
 }
