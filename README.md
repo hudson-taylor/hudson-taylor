@@ -30,20 +30,18 @@ Current Version: 0.0.2
 ## Server quick-start: 
 
 
-### index.js
 
 In your service init you create an ht.Server and add services to it:
 
 ```javascript
+//index.js
 var ht = require("hudson-taylor");
 var myService = require("./myservice"); // Import your service.
 
 var server = new ht.Server(); 
 server.add("myService", myService.setup);
-sserver.listenHTTP({port : 7001});
+server.listenHTTP({port : 7001});
 ```
-
-### echo.js 
 
 Services are simply a setup function which takes a Service object with an 'on'
 method, and a ready callback. You will use 's.on' to register APIs, 'on' takes
@@ -54,6 +52,7 @@ service setup function, this is handy for passing in database connections,
 config and other helpers.
 
 ```javascript
+//myservice.js
 exports.setup = function(s, ready) {
 
     s.on("echo", s.Object({input : s.String({min:3})}), function(data, callback) {
@@ -70,8 +69,8 @@ To connect to our service via HTTP, we create an ht.Services object and
 use it to connect to one or more services via a Client connector.
 
 ```javascript
-var s = ht.Services();
-s.connect("myService", ht.HTTPClient("localhost", 7001));
+var s = new ht.Services();
+s.connect("myService", new ht.HTTPClient("localhost", 7001));
 
 s.remote("myService", "echo", {input : "Hello World!", function(err, res) { 
     // Do things with the response here! 
@@ -85,25 +84,12 @@ s.remote("myService", "echo", {input : "Hello World!", function(err, res) {
 This lets you get up and running without client/server, just one process to 
 start with:
 
-### myservice.js
+
 
 ```javascript
-exports.setup = function(s, ready, db, config, logger) {
-
-    s.on("echo", s.Object({input : s.String({min:3})}), function(data, callback) {
-        logger.log("woo!");
-        callback(null, data.input);
-    });
-
-    ready(); 
-}
-```
-
-### index.js
-
-```javascript
-var s = ht.Services();
-s.connect("myService", ht.LocalService("myService", myservice.setup, db, config, logger));
+// index.js
+var s = new ht.Services();
+s.connect("myService", new ht.LocalService("myService", myservice.setup, db, config, logger));
 
 s.remote("myService", "echo", {input : "Hello World!", function(err, res) { 
     // Do things with the response here! 
@@ -229,5 +215,21 @@ Note: Array validators match in precidence left to right.
 
 ### s.Date { opt : false, min : null, max : null }
 
+
+## Utils
+
+### ht.utils.expressProxy
+
+expressProxy is a helper that lets you map express.js routes to ht service calls.
+The proxy looks for and merges: request.body, request.params, request.query.
+
+```javascript
+var services = new ht.Services();
+services.connect("myService", new ht.HTTPClient("localhost", 7001));
+
+var app = express();
+app.get('/api/echo/:message', ht.utils.expressProxy(services, "myService", "echo")); 
+
+```
 
 
