@@ -19,7 +19,16 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.2
+Current Version: 0.0.3
+
+Changelog 0.0.3:
+
+ * Added ht.utils.expressProxy for mapping services to express routes. 
+
+Changelog: 0.0.2:
+
+* Added schema support.
+* Added unit testing for schemas and basic API use.
 
 ### Todos:
 
