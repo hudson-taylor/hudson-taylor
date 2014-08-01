@@ -19,7 +19,11 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.3
+Current Version: 0.0.5
+
+Changelog 0.0.5:
+
+ * Bug fixes around min/max schema args not matching min values.
 
 Changelog 0.0.3:
 

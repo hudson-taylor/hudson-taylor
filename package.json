@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Library for building services.",
   "scripts": {
     "test": "mocha --reporter spec --bail --check-leaks test/"
