@@ -1,7 +1,14 @@
 {
   "name": "hudson-taylor",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Library for building services.",
+  "keywords" : [
+    "SOA",
+    "services",
+    "json-rpc2",
+    "RPC",
+    "schemas"
+  ],
   "scripts": {
     "test": "mocha --reporter spec --bail --check-leaks test/"
   },

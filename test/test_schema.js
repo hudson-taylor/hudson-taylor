@@ -10,6 +10,7 @@ describe("Schemas", function() {
         var ceilingCat = { name : "Pixel", colour : "purple" };
         var basementCat = { name : "Penny" };
         var specialCat = { name : "Pixel", colour : "purple", lasers : true };
+        var purryCat = { name : "Pixel", colour : "purple", goes : 'purr' };
         var catOwner = { name : "Bea", cat : ceilingCat };
 
         it("should accept a strictly valid object", function() {
@@ -34,6 +35,18 @@ describe("Schemas", function() {
                 colour : s.String()
             });
             assert.deepEqual(catSchemaPermissive.validate(specialCat), specialCat);
+        });
+
+        it("should apply a '*' validator to unknown fields with strict set false", function() {
+            var catSchemaPermissiveWithStar = s.Object({strict : false}, {
+                name : s.String(),
+                colour : s.String(),
+                '*' : s.String({enum : ['meow','purr']})
+            });
+            assert.throws(function(){
+                catSchemaPermissiveWithStar.validate(specialCat);}, Error);
+            assert.deepEqual(
+                catSchemaPermissiveWithStar.validate(purryCat), purryCat);
         });
 
         it("should accept null if optional", function() {

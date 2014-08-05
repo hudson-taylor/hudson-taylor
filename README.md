@@ -19,7 +19,13 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.5
+Current Version: 0.0.6
+
+Changelog 0.0.6:
+
+ * Added support for an optional '*' validator to Object validation in non-strict
+   mode. The '*' validator will be run against any undefined attributes.
+ * Added unit test for '*' validators.
 
 Changelog 0.0.5:
 
