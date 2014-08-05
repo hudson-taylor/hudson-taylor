@@ -83,7 +83,7 @@ use it to connect to one or more services via a Client connector.
 
 ```javascript
 var s = new ht.Services();
-s.connect("myService", new ht.HTTPClient("localhost", 7001));
+s.connect("myService", new ht.HTTPClient("myService", "localhost", 7001));
 
 s.remote("myService", "echo", {input : "Hello World!", function(err, res) { 
     // Do things with the response here! 
