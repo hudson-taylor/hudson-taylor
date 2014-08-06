@@ -19,12 +19,16 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.6
+Current Version: 0.0.7
+
+Changelog 0.0.7:
+
+ * Added Email validator.
 
 Changelog 0.0.6:
 
- * Added support for an optional '*' validator to Object validation in non-strict
-   mode. The '*' validator will be run against any undefined attributes.
+ * Added support for an optional '\*' validator to Object validation in non-strict
+   mode. The '\*' validator will be run against any undefined attributes.
  * Added unit test for '*' validators.
 
 Changelog 0.0.5:
@@ -233,6 +237,10 @@ Note: Array validators match in precidence left to right.
 ### s.Boolean { opt : false }
 
 ### s.Date { opt : false, min : null, max : null }
+
+### s.Email { opt : false, normalize : true }
+
+If normalize is true (default) then the output email will be lowercased.
 
 
 ## Utils
