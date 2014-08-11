@@ -38,6 +38,7 @@ describe("Client/Server APIs", function() {
         it("should listen and accept requests", function(done) {
             client.remote(
                 "testService", "test", {message : "hi!"}, function(err, response) {
+                    console.log(err);
                     assert.equal(response, "hi!");
                     done();
             });

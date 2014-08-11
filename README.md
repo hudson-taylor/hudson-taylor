@@ -19,7 +19,11 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.7
+Current Version: 0.0.8
+
+Changelog 0.0.8:
+
+ * Added support for 'foo as bar' keys in schemas, accepts foo, maps to bar.
 
 Changelog 0.0.7:
 
@@ -196,6 +200,12 @@ cat attribute must be an object with a name:
 ```javascript
     s.Object({strict : false}, { cat : s.Object({ name: s.String() }) });
 ```
+
+An object validator that requires a foo attribute but remaps it to bar in output.
+```javascript
+    s.Object({ 'foo as bar' : s.String() });
+```
+
 
 ### s.Number { opt : false }
 

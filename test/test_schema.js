@@ -37,6 +37,15 @@ describe("Schemas", function() {
             assert.deepEqual(catSchemaPermissive.validate(specialCat), specialCat);
         });
 
+        it("should rename attributes with keys of the form 'foo as bar'", function() {
+            var schema = s.Object({
+                'name as catName' : s.String(),
+                colour : s.String()
+            });
+            assert.equal(schema.validate(ceilingCat).catName, 'Pixel');
+        });
+
+
         it("should apply a '*' validator to unknown fields with strict set false", function() {
             var catSchemaPermissiveWithStar = s.Object({strict : false}, {
                 name : s.String(),
