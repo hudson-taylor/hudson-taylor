@@ -31,8 +31,7 @@ describe("Client/Server APIs", function() {
         });
 
         after(function(done){
-            server.closeAll();
-            done();
+            server.closeAll(done);
         });
 
         it("should listen and accept requests", function(done) {

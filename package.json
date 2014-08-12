@@ -2,7 +2,7 @@
   "name": "hudson-taylor",
   "version": "0.0.8",
   "description": "Library for building services.",
-  "keywords" : [
+  "keywords": [
     "SOA",
     "services",
     "json-rpc2",
@@ -14,10 +14,11 @@
   },
   "author": "Pomke",
   "license": "MIT",
-  "repository" : "git@github.com:pomke/hudson-taylor.git",
+  "repository": "git@github.com:pomke/hudson-taylor.git",
   "dependencies": {
-    "json-rpc2" : "0.6.0",
-    "isemail" : "1.0.1"
+    "async": "^0.9.0",
+    "isemail": "1.0.1",
+    "json-rpc2": "0.6.0"
   },
   "devDependencies": {
     "mocha": "~1.21.0"
