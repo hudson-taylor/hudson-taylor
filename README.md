@@ -19,7 +19,11 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.8
+Current Version: 0.0.9
+
+Changelog 0.0.9:
+
+ * Merged Someoneweird's branch which closes services asynchronously.
 
 Changelog 0.0.8:
 
