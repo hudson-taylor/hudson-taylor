@@ -66,6 +66,13 @@ describe("Schemas", function() {
             assert.deepEqual(catSchema.validate(null), null);
         });
 
+        it("should use default value if missing key (or value)", function() {
+            var catSchema = s.Object({}, {
+                name: s.String({ default: 'something' })
+            });
+            assert.deepEqual(catSchema.validate({}), { name: 'something' });
+        });
+
         it("should be composible", function() {
 
             var catSchema = s.Object({opt : true}, {
