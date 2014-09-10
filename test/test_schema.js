@@ -58,6 +58,16 @@ describe("Schemas", function() {
                 catSchemaPermissiveWithStar.validate(purryCat), purryCat);
         });
 
+        it("should delete keys that return DELETEKEY", function() {
+            var catSchema = s.Object({
+                name : s.String({opt : true}),
+                colour : s.String()
+            });
+            var data = {colour : 'blue'};
+            var out = catSchema.validate(data);
+            assert.deepEqual(out, data);
+        });
+
         it("should accept null if optional", function() {
             var catSchema = s.Object({opt : true}, {
                 name : s.String(),

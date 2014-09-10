@@ -19,7 +19,17 @@ comes time to scale out you can break-out services and replicate them
 horizontally.
 
 
-Current Version: 0.0.9
+Current Version: 0.0.11
+
+Changelog 0.0.11:
+
+ * Provide special value {htDeleteKey:true} which, if returned from a validator,
+   shall ensure that the parent validator will delete it's key entirely from any
+   output. If this IS the top level validator, it will return null instead.
+
+Changelog 0.0.10:
+
+ * Moved repo from pomke/hudson-taylor to org hudson-taylor/hudson-taylor
 
 Changelog 0.0.9:
 

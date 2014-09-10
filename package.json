@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Library for building services.",
   "keywords": [
     "SOA",
@@ -14,7 +14,7 @@
   },
   "author": "Pomke",
   "license": "MIT",
-  "repository": "git@github.com:pomke/hudson-taylor.git",
+  "repository": "git@github.com:hudson-taylor/hudson-taylor.git",
   "dependencies": {
     "async": "^0.9.0",
     "isemail": "1.0.1",
