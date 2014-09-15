@@ -9,10 +9,6 @@ var validators = new (function() {
     };
 })();
 
-
-exports.validators = validators;
-exports.makeParser = makeParser;
-
 validators.add("Object", makeParser(objParser, null));
 validators.add("String", makeParser(strParser, null));
 validators.add("Number", makeParser(numParser, null));
@@ -22,6 +18,11 @@ validators.add("Array", makeParser(arrayParser, null));
 validators.add("Email", makeParser(emailParser, null));
 //validators.add("Binary", makeParser(binParser, null));
 
+module.exports            = validators;
+module.exports.makeParser = makeParser;
+
+//identifies a validator that wishes it's key/value obliterated from results
+var DELETEKEY = {htDeleteKey : true}; 
 
 function makeParser(parserFunc, docFunc) {
     //parserFunc takes arguments, child-validators || null, and the data to
@@ -74,15 +75,16 @@ function makeParser(parserFunc, docFunc) {
             self.args = args;
 
 
-            self.parse = function(data, key) {
+            self.parse = function(data, key, first) {
                 //All validators should handle opt (optional)
                 var args = merge(self.args, {opt : false});
                 var val = parserFunc.call(self, args, self.childValidators, data, key);
+                if(first && val != null && typeof val == 'object' && val.htDeleteKey) return null;
                 return val;
             }
 
             self.validate = function(data, key) {
-                return self.parse(data, key || 'schema');
+                return self.parse(data, key || 'schema', true);
             }
 
             self.document = function() {
@@ -97,7 +99,7 @@ function arrayParser(args, childValidators, data, key) {
     childValidators = childValidators || [];
     var out = [];
     if(!data instanceof Array && !args.opt) throw new Error("required Array");
-    if(!data && args.opt) return [];
+    if(!data && args.opt) return DELETEKEY;
     for(var i=0; i < data.length; i++) {
         var val = data[i];
         var matched = false;
@@ -141,14 +143,14 @@ function objParser(args, childValidators, data, key) {
     var out = {};
     //handle no object provided if optional is false
     if(!data && !args.opt) throw new Error("required Object");
-    if(!data && args.opt) return null;
+    if(!data && args.opt) return DELETEKEY;
 
     //check we actually have an object
     var type = typeof data;
     if(type !== 'object') throw new Error("must be an object, recieved "+ type);
 
     var seen = {};
-    // Check that all provided data ias valid to the schema
+    // Check that all provided data is valid to the schema
     for(var k in data) {
         seen[k] = true;
         var v = validator(k);
@@ -194,6 +196,12 @@ function objParser(args, childValidators, data, key) {
             }
         }
     }
+    //Delete any keys that have a value of {htDeleteKey:true}
+    Object.keys(out).forEach(function(k) {
+        if(out[k] != null && typeof out[k] == 'object' && out[k].htDeleteKey) {
+            delete out[k];
+        }
+    });
     return out;
 
 };
@@ -201,7 +209,7 @@ function objParser(args, childValidators, data, key) {
 function strParser(args, childValidators, data) {
     args = merge(args, {min: null, max : null, enum : null});
     if(!data && !args.opt) throw new Error("required String");
-    if(!data && args.opt) return null;
+    if(!data && args.opt) return DELETEKEY;
     var type = typeof data;
     if(type !== "string") throw new Error("required String, recieved " + type+", "+data);
     if(args.min !== null && data.length < args.min) {
@@ -226,7 +234,7 @@ function strParser(args, childValidators, data) {
 function numParser(args, childValidators, data) {
     args = merge(args, {min: null, max : null});
     if(!data && !args.opt) throw new Error("required Number");
-    if(!data && args.opt) return null;
+    if(!data && args.opt) return DELETEKEY;
     var origType = typeof data;
     data = Number(data);
     if(isNaN(data)) throw new Error("required Number, recieved " + origType);
@@ -242,7 +250,7 @@ function numParser(args, childValidators, data) {
 function dateParser(args, childValidators, data) {
     args = merge(args, {min: null, max : null});
     if(!data && !args.opt) throw new Error("required Date");
-    if(!data && args.opt) return null;
+    if(!data && args.opt) return DELETEKEY;
     var origType = typeof data;
     d = new Date(data);
     if(!(d instanceof Date) || isNaN(d.getTime())) {
@@ -260,6 +268,7 @@ function dateParser(args, childValidators, data) {
 
 function boolParser(args, childValidators, data) {
     if(data === null && !args.opt) throw new Error("required Boolean");
+    if(data === null && args.opt) return DELETEKEY;
     return Boolean(data);
 }
 
@@ -267,7 +276,7 @@ function boolParser(args, childValidators, data) {
 function emailParser(args, childValidators, data) {
     args = merge(args, {normalize : true});
     if(!data && !args.opt) throw new Error("required Email address");
-    if(!data && args.opt) return null;
+    if(!data && args.opt) return DELETEKEY;
     var type = typeof data;
     if(type !== "string") throw new Error("required String Email, recieved " + type+", "+data);
     data = data.trim();
@@ -275,4 +284,3 @@ function emailParser(args, childValidators, data) {
     if(!isemail(data)) throw new Error('Invalid Email: ' + data);
     return data;
 }
-

@@ -1,4 +1,4 @@
-exports.expressProxy = function(services, serviceName, signal) {
+exports.expressProxy = function(remote, serviceName, signal) {
     /* expressProxy returns an express route handler for that combines:
      *
      * - post body vars (see express body-parser)
@@ -15,7 +15,7 @@ exports.expressProxy = function(services, serviceName, signal) {
         if(req.params) bits.push(req.params);
         if(req.query) bits.push(req.query);
         var payload = exports.merge.apply(null, bits);
-        services.remote(serviceName, signal, payload, function(err, data) {
+        remote.call(serviceName, signal, payload, function(err, data) {
             if(err) return res.json(500, err);
             res.set({'Content-Type' : 'aplication/json'});
             return res.json(data);
@@ -38,5 +38,3 @@ exports.merge = function merge() {
     }
     return result;
 }
-
-

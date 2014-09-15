@@ -1,26 +1,47 @@
 {
   "name": "hudson-taylor",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "description": "Library for building services.",
-  "keywords": [
-    "SOA",
-    "services",
-    "json-rpc2",
-    "RPC",
-    "schemas"
-  ],
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
   "scripts": {
     "test": "mocha --reporter spec --bail --check-leaks test/"
   },
-  "author": "Pomke",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hudson-taylor/hudson-taylor.git"
+  },
+  "keywords": [
+    "SOA",
+    "services",
+    "RPC",
+    "schemas"
+  ],
+  "author": "Hudson-Taylor developers",
+  "contributors": [
+    {
+      "name": "Pomke",
+      "email": "pomke@pomke.com"
+    },
+    {
+      "name": "Adam Brady",
+      "email": "adam@boxxen.org"
+    }
+  ],
   "license": "MIT",
-  "repository": "git@github.com:pomke/hudson-taylor.git",
+  "bugs": {
+    "url": "https://github.com/hudson-taylor/hudson-taylor/issues"
+  },
+  "homepage": "https://github.com/hudson-taylor/hudson-taylor",
   "dependencies": {
     "async": "^0.9.0",
-    "isemail": "1.0.1",
-    "json-rpc2": "0.6.0"
-  },
-  "devDependencies": {
-    "mocha": "~1.21.0"
+    "body-parser": "^1.8.2",
+    "express": "^4.9.0",
+    "isemail": "^1.1.1",
+    "request": "^2.42.0",
+    "uid2": "0.0.3"
   }
 }
