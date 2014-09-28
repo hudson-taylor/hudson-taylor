@@ -1,21 +1,21 @@
 "use strict";
 
-var Client     = require('../lib/client');
-var Transports = require('../lib/transports')
-var Service    = require('../lib/service');
-var Schema     = require('../lib/schema');
+var Client     = require("../lib/client");
+var Transports = require("../lib/transports");
+var Service    = require("../lib/service");
+var Schema     = require("../lib/schema");
 
 var number     = 10;
 var multiplyBy = 5;
 
 // Make sure you pass the same instance
 // of Transports.Local to both Service
-// and Client or else this won't work!
+// and Client or else this won"t work!
 var mathTransport = new Transports.Local();
 
 var mathService = new Service(mathTransport);
 
-mathService.on('multiply', {
+mathService.on("multiply", {
     number: Schema.Number(),
     by:     Schema.Number()
 }, function(data, callback) {
@@ -23,7 +23,7 @@ mathService.on('multiply', {
 });
 
 var client = new Client({
-    'math': mathTransport
+    "math": mathTransport
 });
 
 // If ALL of your services specified
@@ -31,7 +31,13 @@ var client = new Client({
 // to call connect here either.
 client.connect(function(err) {
 
-    client.call('math', 'multiply', {
+    if(err) {
+        console.error("There was an error connecting to services:");
+        console.error(err);
+        process.exit(1);
+    }
+
+    client.call("math", "multiply", {
         number: number,
         by:     multiplyBy
     }, function(err, response) {
@@ -42,7 +48,7 @@ client.connect(function(err) {
             process.exit(1);
         }
 
-        console.log('%d * %d = %d', number, multiplyBy, response);
+        console.log("%d * %d = %d", number, multiplyBy, response);
 
     });
 

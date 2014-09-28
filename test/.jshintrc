@@ -1,0 +1,9 @@
+{
+    "globals": {
+        "describe": true,
+        "it":       true,
+        "xit":      true,
+        "before":   true,
+        "after":    true
+    }
+}

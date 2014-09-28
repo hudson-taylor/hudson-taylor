@@ -1,12 +1,12 @@
 "use strict";
 
-var express    = require('express');
-var bodyParser = require('body-parser');
-var request    = require('request');
+var express    = require("express");
+var bodyParser = require("body-parser");
+var request    = require("request");
 
 function HTTPTransportServer(config) {
 
-    var path = config.path || '/ht';
+    var path = config.path || "/ht";
 
     var _HTTPTransportServer = function(fn) {
         this.app = express();
@@ -17,7 +17,7 @@ function HTTPTransportServer(config) {
                return res.json(data);
             });
         });
-    }
+    };
 
     _HTTPTransportServer.prototype.listen = function(done) {
         var self = this;
@@ -26,14 +26,14 @@ function HTTPTransportServer(config) {
             self.listening = true;
             done();
         });
-    }
+    };
 
     _HTTPTransportServer.prototype.stop = function(done) {
         if(!this.listening) return done();
         this.http.close();
         this.listening = false;
         done();
-    }
+    };
 
     return _HTTPTransportServer;
 
@@ -42,29 +42,29 @@ function HTTPTransportServer(config) {
 function HTTPTransportClient(config) {
 
     var _HTTPTransportClient = function() {
-        this.url = "http" + (config.ssl ? "s" : "") + "://" + config.host + ":" + config.port + (config.path || '/ht');
-    }
+        this.url = "http" + (config.ssl ? "s" : "") + "://" + config.host + ":" + config.port + (config.path || "/ht");
+    };
 
     _HTTPTransportClient.prototype.connect = function(done) {
         // noop for http
         done();
-    }
+    };
 
     _HTTPTransportClient.prototype.disconnect = function(done) {
         // noop for http
         done();
-    }
+    };
 
     _HTTPTransportClient.prototype.call = function(method, data, callback) {
         request({
             url:    this.url,
-            method: 'POST',
+            method: "POST",
             json:   { method: method, args: data }
         }, function(e, r, body) {
             if(e) return callback(e);
             callback(null, body);
         });
-    }
+    };
 
     return _HTTPTransportClient;
 

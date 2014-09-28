@@ -1,13 +1,13 @@
-var assert = require('assert');
+"use strict";
 
-console.log(__dirname);
+var assert = require("assert");
 
-var Client = require('../lib/client');
+var Client = require("../lib/client");
 
 var services = {
     "test1": mockTransport()({}),
     "test2": mockTransport()({})
-}
+};
 
 describe("Client", function() {
     
@@ -22,7 +22,7 @@ describe("Client", function() {
 
     it("should connect transports", function(done) {
         var connected = { test1: false, test2: false };
-        client.on('connected', function(name) {
+        client.on("connected", function(name) {
             connected[name] = true;
             var num = 0;
             for(var service in connected) {
@@ -37,11 +37,11 @@ describe("Client", function() {
 
     it("should be able to call methods", function(done) {
         var called = { method1: false, method2: false };
-        client.on('called', function(service, method) {
+        client.on("called", function(service, method) {
             called[method] = true;
             var num = 0;
-            for(var method in called) {
-                if(called[method]) num++;
+            for(var call in called) {
+                if(called[call]) num++;
             }
             if(num == Object.keys(called).length) done();
         });
@@ -54,7 +54,7 @@ describe("Client", function() {
     });
 
     xit("should be able to add new service", function(done) {
-
+        done();
     });
 
     it("should throw when adding duplicate service name", function() {
@@ -67,7 +67,7 @@ describe("Client", function() {
 
 function mockTransport(fns) {
     if(!fns) fns = {};
-    var ok = function(done) { done() };
+    var ok = function(done) { done(); };
     var service = function() {};
     var client = function() {};
     service.prototype.listen    = ok;
@@ -76,13 +76,13 @@ function mockTransport(fns) {
     client.prototype.disconnect = ok;
     client.prototype.call = function(method, data, callback) {
         callback(null, data);
-    }
-    var transport = function(config) {
+    };
+    var transport = function() {
         return {
             Client:  client,
             Service: service
-        }
-    }
+        };
+    };
     return transport;
 }
 

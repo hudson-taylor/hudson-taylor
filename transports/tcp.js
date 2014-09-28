@@ -1,14 +1,14 @@
 "use strict";
 
-var net = require('net');
+var net = require("net");
 
-var uid2 = require('uid2');
+var uid2 = require("uid2");
 
 function TCPTransportServer(config) {
 
     var _TCPTransportServer = function(fn) {
         this.server = net.createServer(function(c) {
-            c.on('data', function(d) {
+            c.on("data", function(d) {
                 var response = JSON.parse(d); // lol
                 var id   = response.id;
                 var name = response.name;
@@ -23,26 +23,27 @@ function TCPTransportServer(config) {
                 });
             });
         });
-    }
+    };
 
     _TCPTransportServer.prototype.listen = function(done) {
         var self = this;
         if(this.listening) return done();
         this.server.listen(config.port, config.host, function(err) {
             if(err) return done(err);
-            this.listening = true;
+            self.listening = true;
             done();
         });
-    }
+    };
 
     _TCPTransportServer.prototype.stop = function(done) {
+        var self = this;
         if(!this.listening) return done();
         this.server.close(function(err) {
             if(err) return done(err);
-            this.listening = false;
+            self.listening = false;
             done();
         });
-    }
+    };
 
     return _TCPTransportServer;
 
@@ -52,18 +53,18 @@ function TCPTransportClient(config) {
 
     var _TCPTransportClient = function() {
         this.fns = {};
-    }
+    };
 
     _TCPTransportClient.prototype.connect = function(done) {
         var self = this;
         // open a persistent connection to the server
         this.conn = net.createConnection(config.port, config.host);
-        this.conn.setEncoding('utf8');
-        this.conn.on('connect', function() {
+        this.conn.setEncoding("utf8");
+        this.conn.on("connect", function() {
             self.connected = true;
             done();
         });
-        this.conn.on('data', function(d) {
+        this.conn.on("data", function(d) {
             var response = JSON.parse(d);
             var id    = response.id;
             var error = response.error;
@@ -80,19 +81,19 @@ function TCPTransportClient(config) {
                 return fn(null, data);
             }
         });
-    }
+    };
 
     _TCPTransportClient.prototype.disconnect = function(done) {
         if(!this.connected) done();
         this.conn.end();
         this.connected = false;
         done();
-    }
+    };
 
     _TCPTransportClient.prototype.call = function(method, data, callback) {
         if(!this.connected) {
             return callback({
-                error: 'disconected'
+                error: "disconnected"
             });
         }
         var id = uid2(10);
@@ -104,7 +105,7 @@ function TCPTransportClient(config) {
         // stash callback for later
         this.fns[id] = callback;
         this.conn.write(request);
-    }
+    };
 
     return _TCPTransportClient;
 
