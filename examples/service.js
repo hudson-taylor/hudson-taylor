@@ -1,3 +1,5 @@
+"use strict";
+
 var Service    = require('../lib/service');
 var Transports = require('../lib/transports')
 

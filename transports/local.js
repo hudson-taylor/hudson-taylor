@@ -1,3 +1,5 @@
+"use strict";
+
 var fn;
 
 function LocalTransportServer(_fn) {

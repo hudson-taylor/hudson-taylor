@@ -1,3 +1,5 @@
+"use strict";
+
 var net = require('net');
 
 var uid2 = require('uid2');

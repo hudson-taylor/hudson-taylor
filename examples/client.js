@@ -1,3 +1,5 @@
+"use strict";
+
 var Client     = require('../lib/client');
 var Transports = require('../lib/transports')
 
