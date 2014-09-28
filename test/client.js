@@ -2,7 +2,7 @@ var assert = require('assert');
 
 console.log(__dirname);
 
-var Client = require('../client');
+var Client = require('../lib/client');
 
 var services = {
     "test1": mockTransport()({}),

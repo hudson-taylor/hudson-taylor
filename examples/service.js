@@ -1,5 +1,5 @@
-var Service    = require('../service');
-var Transports = require('../transports')
+var Service    = require('../lib/service');
+var Transports = require('../lib/transports')
 
 var config = { host: '0.0.0.0', port: 10000 };
 

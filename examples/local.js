@@ -1,7 +1,7 @@
-var Client     = require('../client');
-var Transports = require('../transports')
-var Service    = require('../service');
-var Schema     = require('../schema');
+var Client     = require('../lib/client');
+var Transports = require('../lib/transports')
+var Service    = require('../lib/service');
+var Schema     = require('../lib/schema');
 
 var number     = 10;
 var multiplyBy = 5;

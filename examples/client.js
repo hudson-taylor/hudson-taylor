@@ -1,5 +1,5 @@
-var Client     = require('../client');
-var Transports = require('../transports')
+var Client     = require('../lib/client');
+var Transports = require('../lib/transports')
 
 var remote = new Client({
     ident: new Transports.TCP({ host: "127.0.0.1", port: 10000 })
