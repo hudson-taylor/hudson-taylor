@@ -27,7 +27,21 @@ LocalTransportClient.prototype.disconnect = function(done) {
 };
 
 LocalTransportClient.prototype.call = function(method, data, callback) {
-    fn(method, data, callback);
+    // force data to be passed through as valid json
+    // both the input, and the response from the service
+    forceJSON(data, function(err, data) {
+        if(err) return callback(err);
+        fn(method, data, function(err, response) {
+            if(err) {
+                return forceJSON(err, function(err) {
+                    callback(err);
+                });
+            }
+            forceJSON(response, function(response) {
+                callback(null, response);
+            });
+        });
+    });
 };
 
 function LocalTransport() {
@@ -36,3 +50,13 @@ function LocalTransport() {
 }
 
 module.exports = LocalTransport;
+
+function forceJSON(input, callback) {
+    // JSON.stringify can throw on circular structures
+    try {
+        input = JSON.parse(JSON.stringify(input));
+    } catch(e) {
+        return callback(e);
+    }
+    return callback(null, input);
+}
