@@ -3,7 +3,7 @@
 var Client     = require("../lib/client");
 var Transports = require("../lib/transports");
 var Service    = require("../lib/service");
-var Schema     = require("../lib/schema");
+var Schema     = require("ht-schema");
 
 var number     = 10;
 var multiplyBy = 5;
