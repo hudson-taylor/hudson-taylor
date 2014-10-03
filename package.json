@@ -43,5 +43,8 @@
     "ht-schema": "0.0.1",
     "request": "^2.42.0",
     "uid2": "0.0.3"
+  },
+  "devDependencies": {
+    "supertest": "^0.14.0"
   }
 }
