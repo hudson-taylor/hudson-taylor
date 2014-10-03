@@ -1,6 +1,8 @@
 hudson-taylor
 =============
 
+Warning: this branch is currently not published on NPM.
+
 Hudson Taylor (ht) is a client/server library for building automatically 
 documented, well validated services (SOA) in Node.js
 
