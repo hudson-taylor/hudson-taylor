@@ -11,6 +11,7 @@ var Service    = require("../lib/service");
 var Client     = require("../lib/client");
 var Transports = require("../lib/transports");
 var utils      = require("../lib/utils");
+var s          = require("ht-schema");
 
 describe("Utilities", function() {
     
@@ -23,7 +24,7 @@ describe("Utilities", function() {
             transport = new Transports.Local();
             service   = new Service(transport);
 
-            service.on("data", {}, function(data, callback) {
+            service.on("data", s.Object({opt:true, strict:false}), function(data, callback) {
                 return callback(null, { body: data });
             });
 

@@ -3,7 +3,7 @@
 var Client     = require("../lib/client");
 var Transports = require("../lib/transports");
 var Service    = require("../lib/service");
-var Schema     = require("ht-schema");
+var s          = require("ht-schema");
 
 var number     = 10;
 var multiplyBy = 5;
@@ -13,12 +13,13 @@ var multiplyBy = 5;
 // and Client or else this won"t work!
 var mathTransport = new Transports.Local();
 
-var mathService = new Service(mathTransport);
+var mathService = new Service(mathTransport, {logger : console.log});
 
-mathService.on("multiply", {
-    number: Schema.Number(),
-    by:     Schema.Number()
-}, function(data, callback) {
+mathService.on("multiply", s.Object({
+    number: s.Number(),
+    by:     s.Number()
+}), function(data, callback, logger) {
+    logger(data);
     callback(null, data.number * data.by);
 });
 
