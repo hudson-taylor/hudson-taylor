@@ -10,7 +10,7 @@ var transport = new Transports.TCP(config);
 
 var identService = new Service(transport, {logger : console.log});
 
-identService.on("getUser", , function(req, callback, logger) {
+identService.on("getUser", , function(data, callback, logger) {
 
     logger("echo back", data);
     // echo name back
