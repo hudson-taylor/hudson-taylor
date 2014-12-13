@@ -8,11 +8,10 @@ var config = { host: "0.0.0.0", port: 10000 };
 
 var transport = new Transports.TCP(config);
 
-var identService = new Service(transport, {logger : console.log});
+var identService = new Service(transport);
 
-identService.on("getUser", , function(data, callback, logger) {
+identService.on("getUser", function(data, callback) {
 
-    logger("echo back", data);
     // echo name back
     callback(null, { name: data.name });
 
