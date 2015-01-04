@@ -1,26 +1,24 @@
 hudson-taylor
 =============
 
-Warning: this branch is currently not published on NPM.
-
-Hudson Taylor (ht) is a client/server library for building automatically 
+Hudson Taylor (ht) is a client/server library for building automatically
 documented, well validated services (SOA) in Node.js
 
-HT comprises of a server library for providing services with well documented 
-and defined APIs with validation, and client libraries for calling 
+HT comprises of a server library for providing services with well documented
+and defined APIs with validation, and client libraries for calling
 services over a number of transports, HTTP, Websocket, TCP or in-process.
 
-All service APIs have a schema that both document expectations as well as 
-validates and pre-processes incoming data. 
+All service APIs have a schema that both document expectations as well as
+validates and pre-processes incoming data.
 
 
-As well as providing for seperate processes communicating with eachother, HT 
+As well as providing for seperate processes communicating with eachother, HT
 can be used within a single process to logically partition services. This means
-that your project has clean internal interfaces from the outset, and when it 
+that your project has clean internal interfaces from the outset, and when it
 comes time to scale out you can break-out services and replicate them
 horizontally.
 
-Current Version: 0.1.0
+Current Version: 2.0.0
 
 See [Changelog here](CHANGELOG.md)
 
@@ -28,7 +26,7 @@ See [Changelog here](CHANGELOG.md)
 
  * Automatic documentation generation still WIP
 
-## Server quick-start: 
+## Server quick-start:
 
 In your service init you create an ht.Server and add services to it:
 
@@ -73,7 +71,7 @@ service.listen(function(err) {
 
 ## Client quick-start:
 
-To connect to our service via HTTP, we create an ht.Services object and 
+To connect to our service via HTTP, we create an ht.Services object and
 use it to connect to one or more services via a Client connector.
 
 ```javascript
@@ -116,7 +114,7 @@ remote.connect(function(err) {
 
 ## Single-process quick-start:
 
-This lets you get up and running without client/server, just one process to 
+This lets you get up and running without client/server, just one process to
 start with:
 
 ```javascript
@@ -138,9 +136,9 @@ var remote = new ht.Client({
 // local transports, but if you mix local transports with
 // other ones, you do.
 
-remote.call("myService", "echo", { 
+remote.call("myService", "echo", {
     input: "Hello World!"
-}, function(err, res) { 
+}, function(err, res) {
     if(err) {
         console.error("There was an error:", err);
         process.exit(1);
@@ -151,12 +149,12 @@ remote.call("myService", "echo", {
 
 # The details:
 
-## Methods of communicating between services: 
+## Methods of communicating between services:
 
-One of the nice things about HT is that you can connect to a service via 
-methods without having to change your service code in any way. 
+One of the nice things about HT is that you can connect to a service via
+methods without having to change your service code in any way.
 
-Hudson-Taylor is bundled with a couple of low-level transports such as: 
+Hudson-Taylor is bundled with a couple of low-level transports such as:
 
 * TCP:   uses long-lived TCP sockets for communication between client & server
 * HTTP:  uses HTTP requests
@@ -187,6 +185,6 @@ var app = express();
 
 app.get('/api/echo/:message', ht.utils.expressProxy(remote, "myService", "echo"));
 
-// etc... 
+// etc...
 
 ```

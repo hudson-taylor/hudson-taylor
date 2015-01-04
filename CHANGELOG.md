@@ -1,3 +1,9 @@
+Changelog 2.0.0:
+
+ * Project converted to ES6.
+ * Myriad number of bugfixes and changes.
+ * Project rewrite published to npm.
+
 Changelog 0.1.0:
 
  * Extreme refactor of all internals, allows using custom transports and schemas.
