@@ -1,23 +1,23 @@
 "use strict";
 
-var net = require("net");
+const net = require("net");
 
-var uid2 = require("uid2");
+const uid2 = require("uid2");
 
 function TCPTransportServer(config) {
 
-    var _TCPTransportServer = function(fn) {
+    let _TCPTransportServer = function(fn) {
         this.server = net.createServer(function(c) {
-            c.on("data", function(d) {
-                var response = JSON.parse(d); // lol
-                var id   = response.id;
-                var name = response.name;
-                var data = response.data;
-                fn(name, data, function(err, d) {
-                    var response = JSON.stringify({
-                        id:    id,
-                        error: err,
-                        data:  d
+            c.on("data", function(_response) {
+
+                let response           = JSON.parse(_response);
+                let { id, name, data } = response;
+
+                fn(name, data, function(error, d) {
+                    let response = JSON.stringify({
+                        data: d,
+                        id,
+                        error
                     });
                     c.write(response);
                 });
@@ -26,20 +26,28 @@ function TCPTransportServer(config) {
     };
 
     _TCPTransportServer.prototype.listen = function(done) {
-        var self = this;
-        if(this.listening) return done();
+        let self = this;
+        if(this.listening) {
+            return done();
+        }
         this.server.listen(config.port, config.host, function(err) {
-            if(err) return done(err);
+            if(err) {
+                return done(err);
+            }
             self.listening = true;
             done();
         });
     };
 
     _TCPTransportServer.prototype.stop = function(done) {
-        var self = this;
-        if(!this.listening) return done();
+        let self = this;
+        if(!this.listening) {
+            return done();
+        }
         this.server.close(function(err) {
-            if(err) return done(err);
+            if(err) {
+                return done(err);
+            }
             self.listening = false;
             done();
         });
@@ -51,12 +59,12 @@ function TCPTransportServer(config) {
 
 function TCPTransportClient(config) {
 
-    var _TCPTransportClient = function() {
+    let _TCPTransportClient = function() {
         this.fns = {};
     };
 
     _TCPTransportClient.prototype.connect = function(done) {
-        var self = this;
+        let self = this;
         // open a persistent connection to the server
         this.conn = net.createConnection(config.port, config.host);
         this.conn.setEncoding("utf8");
@@ -65,12 +73,12 @@ function TCPTransportClient(config) {
             done();
         });
         this.conn.on("data", function(d) {
-            var response = JSON.parse(d);
-            var id    = response.id;
-            var error = response.error;
-            var data  = response.data;
+
+            let response            = JSON.parse(d);
+            let { id, error, data } = response;
+
             // find callback we stashed
-            var fn = self.fns[id];
+            let fn = self.fns[id];
             if(!fn) {
                 // unknown, drop
                 return;
@@ -84,7 +92,9 @@ function TCPTransportClient(config) {
     };
 
     _TCPTransportClient.prototype.disconnect = function(done) {
-        if(!this.connected) done();
+        if(!this.connected) {
+            return done();
+        }
         this.conn.end();
         this.connected = false;
         done();
@@ -96,11 +106,11 @@ function TCPTransportClient(config) {
                 error: "disconnected"
             });
         }
-        var id = uid2(10);
-        var request = JSON.stringify({
-            id:   id,
+        let id = uid2(10);
+        let request = JSON.stringify({
             name: method,
-            data: data
+            data,
+            id
         });
         // stash callback for later
         this.fns[id] = callback;
@@ -116,4 +126,4 @@ function TCPTransport(config) {
     this.Client = TCPTransportClient(config);
 }
 
-module.exports = TCPTransport;
+export default TCPTransport;

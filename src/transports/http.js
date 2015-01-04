@@ -5,15 +5,15 @@
 
 "use strict";
 
-var express    = require("express");
-var bodyParser = require("body-parser");
-var request    = require("request");
+const express    = require("express");
+const bodyParser = require("body-parser");
+const request    = require("request");
 
 function HTTPTransportServer(config) {
 
-    var path = config.path || "/ht";
+    let path = config.path || "/ht";
 
-    var _HTTPTransportServer = function(fn) {
+    let _HTTPTransportServer = function(fn) {
         // An instance of _HTTPTransportServer is created
         // when this transport is passed into ht.Service.
         // Here, we can setup services that need to persist,
@@ -30,8 +30,10 @@ function HTTPTransportServer(config) {
             // back it is up to the transport to digest these and
             // communicate back to the client.
             fn(req.body.method, req.body.args, function(err, data) {
-               if(err) return res.status(500).json({ error: err.toString() });
-               return res.json(data);
+                if(err) {
+                    return res.status(500).json({ error: err.toString() });
+                }
+                return res.json(data);
             });
         });
     };
@@ -42,7 +44,7 @@ function HTTPTransportServer(config) {
         // on the parent Service object. It can be called
         // multiple times, so be sure to track if things
         // are listening or not.
-        var self = this;
+        let self = this;
         if(this.listening) return done();
         this.http = this.app.listen(config.port, config.host, function() {
             self.listening = true;
@@ -66,7 +68,7 @@ function HTTPTransportServer(config) {
 
 function HTTPTransportClient(config) {
 
-    var _HTTPTransportClient = function() {
+    let _HTTPTransportClient = function() {
         // An instance of _HTTPTransportClient is created
         // when this transport is passed into ht.Client.
         // Here, we can setup persistent connects (see tcp transport)
@@ -97,9 +99,11 @@ function HTTPTransportClient(config) {
         request({
             url:    this.url,
             method: "POST",
-            json:   { method: method, args: data }
+            json:   { method, args: data }
         }, function(e, r, body) {
-            if(e) return callback(e);
+            if(e) {
+                return callback(e);
+            }
             callback(null, body);
         });
     };
@@ -116,4 +120,4 @@ function HTTPTransport(config) {
     this.Client = HTTPTransportClient(config);
 }
 
-module.exports = HTTPTransport;
+export default HTTPTransport;

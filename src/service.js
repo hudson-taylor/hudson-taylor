@@ -1,11 +1,11 @@
+
 "use strict";
 
-var async   = require("async");
-var s       = require("ht-schema");
+const async   = require("async");
+const s       = require("ht-schema");
 
-
-var Service = module.exports = function Service(Transports, config) {
-    var self = this;
+let Service = function Service(Transports, config) {
+    let self = this;
 
     this.config   = config;
     this._methods = {};
@@ -15,13 +15,13 @@ var Service = module.exports = function Service(Transports, config) {
         Transports = [ Transports ];
     }
 
-    var fn = function(method, data, cb) {
-        var _tmp = self._methods[method];
+    let fn = function(method, data, cb) {
+        let _tmp = self._methods[method];
         if(!_tmp) return cb({ error: "unknown-method" });
 
         if(_tmp.schema) {
             try {
-                if(!_tmp.schema.hasOwnProperty('childValidators')) {
+                if(!_tmp.schema.childValidators) {
                     data = s.Object(_tmp.schema).validate(data);
                 } else {
                     data = _tmp.schema.validate(data);
@@ -33,12 +33,12 @@ var Service = module.exports = function Service(Transports, config) {
             }
         }
 
-        //call the function, injecting extra args from config
-        var s = _tmp.fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
-        var args = s.slice(s.indexOf('(') + 1, s.indexOf(')')).match(
-                /([^\s,]+)/g) || [];
-        _tmp.fn.apply(null, [data, cb].concat(
-                    args.slice(2).map(function(a){return config[a];})));
+        // Call the function, injecting extra args from config
+        let _s = _tmp.fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
+        let args = _s.slice(_s.indexOf('(') + 1, _s.indexOf(')')).match(/([^\s,]+)/g) || [];
+        _tmp.fn.apply(null, [data, cb].concat(args.slice(2).map(function(a) {
+            return config[a];
+        })));
 
     };
 
@@ -50,14 +50,14 @@ var Service = module.exports = function Service(Transports, config) {
 
 Service.prototype.on = function(method, schema, fn) {
 
-    if(typeof schema == 'function') {
+    if(!fn) {
         fn = schema;
         schema = null;
     }
 
     this._methods[method] = {
-        schema: schema,
-        fn:     fn
+        schema,
+        fn
     };
 
 };
@@ -73,3 +73,5 @@ Service.prototype.stop = function(done) {
         s.stop(cb);
     }, done);
 };
+
+export default Service;

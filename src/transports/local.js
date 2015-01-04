@@ -1,6 +1,7 @@
+
 "use strict";
 
-var fn;
+let fn;
 
 function LocalTransportServer(_fn) {
     fn = _fn;
@@ -52,7 +53,7 @@ function LocalTransport() {
     this.Client = LocalTransportClient;
 }
 
-module.exports = LocalTransport;
+export default LocalTransport;
 
 function forceJSON(input, callback) {
     // JSON.stringify can throw on circular structures
