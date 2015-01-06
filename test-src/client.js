@@ -1,31 +1,38 @@
+
 "use strict";
 
-var assert = require("assert");
+const assert = require("assert");
 
-var Client = require("../lib/client");
-
-var services = {
-    "test1": mockTransport()({}),
-    "test2": mockTransport()({})
-};
+const Client = require("../lib/client");
 
 describe("Client", function() {
-    
-    var client;
 
-    before(function() {
+    it("should add initial services on created", function() {
 
-        // should probably be in its own test
-        client = new Client(services);
+        let called = 0;
+
+        let services = {
+            hello: { Client() { called++; } },
+            world: { Client() { called++; } }
+        }
+
+        let client = new Client(services);
+
+        assert.equal(called, Object.keys(services).length);
 
     });
 
     it("should connect transports", function(done) {
-        var connected = { test1: false, test2: false };
+        let services = {
+            "test1": mockTransport()({}),
+            "test2": mockTransport()({})
+        }
+        let client = new Client(services);
+        let connected = { test1: false, test2: false };
         client.on("connected", function(name) {
             connected[name] = true;
-            var num = 0;
-            for(var service in connected) {
+            let num = 0;
+            for(let service in connected) {
                 if(connected[service]) num++;
             }
             if(num == Object.keys(connected).length) done();
@@ -36,11 +43,16 @@ describe("Client", function() {
     });
 
     it("should be able to call methods", function(done) {
-        var called = { method1: false, method2: false };
+        let services = {
+            "test1": mockTransport()({}),
+            "test2": mockTransport()({})
+        }
+        let client = new Client(services);
+        let called = { method1: false, method2: false };
         client.on("called", function(service, method) {
             called[method] = true;
-            var num = 0;
-            for(var call in called) {
+            let num = 0;
+            for(let call in called) {
                 if(called[call]) num++;
             }
             if(num == Object.keys(called).length) done();
@@ -53,23 +65,80 @@ describe("Client", function() {
         });
     });
 
-    xit("should be able to add new service", function(done) {
-        done();
-    });
-
     it("should throw when adding duplicate service name", function() {
+        let services = {
+            "test1": mockTransport()({}),
+            "test2": mockTransport()({})
+        }
+        let client = new Client(services);
         assert.throws(function() {
             client.add(firstKey(services), mockTransport());
         });
+    });
+
+    it("should be able to add new service", function() {
+        let services = {
+            "test1": mockTransport()({}),
+            "test2": mockTransport()({})
+        }
+        let client = new Client(services);
+        let countBefore = Object.keys(client.connections).length;
+        client.add("test3", mockTransport()({}));
+        assert.equal(Object.keys(client.connections).length, countBefore+1);
+    });
+
+    it("should call connect on all services passed into client", function(done) {
+
+        let called = 0;
+
+        let fn = { Client() { return { connect(done) { called++; done() } } } };
+
+        let services = {
+            test1: fn,
+            test2: fn,
+            test3: fn
+        }
+
+        let client = new Client(services);
+
+        client.connect(function(err) {
+            assert.ifError(err);
+            assert.equal(called, Object.keys(services).length);
+            done();
+        });
+
+    });
+
+
+    it("should call disconnect on all services passed into client", function(done) {
+
+        let called = 0;
+
+        let fn = { Client() { return { disconnect(done) { called++; done() } } } };
+
+        let services = {
+            test1: fn,
+            test2: fn,
+            test3: fn
+        }
+
+        let client = new Client(services);
+
+        client.disconnect(function(err) {
+            assert.ifError(err);
+            assert.equal(called, Object.keys(services).length);
+            done();
+        });
+
     });
 
 });
 
 function mockTransport(fns) {
     if(!fns) fns = {};
-    var ok = function(done) { done(); };
-    var service = function() {};
-    var client = function() {};
+    let ok = function(done) { done(); };
+    let service = function() {};
+    let client = function() {};
     service.prototype.listen    = ok;
     service.prototype.stop      = ok;
     client.prototype.connect    = ok;
@@ -77,7 +146,7 @@ function mockTransport(fns) {
     client.prototype.call = function(method, data, callback) {
         callback(null, data);
     };
-    var transport = function() {
+    let transport = function() {
         return {
             Client:  client,
             Service: service
@@ -87,5 +156,5 @@ function mockTransport(fns) {
 }
 
 function firstKey(obj) {
-    for(var k in obj) return k;
+    for(let k in obj) return k;
 }

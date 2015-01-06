@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run build && mocha --reporter spec --bail --check-leaks test/",
+    "test": "npm run build && mocha --recursive --reporter spec --bail --check-leaks test/",
     "build": "node ./node_modules/6to5/bin/6to5 src -d lib && node ./node_modules/6to5/bin/6to5 test-src -d test",
     "prepublish": "npm run build"
   },
@@ -49,6 +49,7 @@
   "devDependencies": {
     "6to5": "^2.4.10",
     "mocha": "^2.1.0",
+    "openport": "0.0.3",
     "supertest": "^0.14.0"
   }
 }

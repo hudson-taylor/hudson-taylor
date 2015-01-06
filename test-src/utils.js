@@ -1,23 +1,23 @@
 
 "use strict";
 
-var assert = require("assert");
+const assert = require("assert");
 
-var express    = require("express");
-var bodyParser = require("body-parser");
-var supertest  = require("supertest");
+const express    = require("express");
+const bodyParser = require("body-parser");
+const supertest  = require("supertest");
 
-var Service    = require("../lib/service");
-var Client     = require("../lib/client");
-var Transports = require("../lib/transports");
-var utils      = require("../lib/utils");
-var s          = require("ht-schema");
+const Service    = require("../lib/service");
+const Client     = require("../lib/client");
+const Transports = require("../lib/transports");
+const utils      = require("../lib/utils");
+const s          = require("ht-schema");
 
 describe("Utilities", function() {
     
     describe("Express Proxy", function() {
 
-        var transport, service, client, app, request;
+        let transport, service, client, app, request;
 
         before(function() {
 
@@ -41,7 +41,7 @@ describe("Utilities", function() {
 
         it("should add middleware properly", function() {
 
-            var fn = utils.expressProxy(client, "s", "data");
+            let fn = utils.expressProxy(client, "s", "data");
 
             app.post("/test", fn);
             app.get("/test", fn);
@@ -51,33 +51,33 @@ describe("Utilities", function() {
         it("should request with GET query params", function(done) {
 
             request.get("/test?hello=world")
-                    .end(function(err, res) {
+            .end(function(err, res) {
 
-                        assert.ifError(err);
+                assert.ifError(err);
 
-                        assert.deepEqual(res.body, { body: { hello: "world" } });
+                assert.deepEqual(res.body, { body: { hello: "world" } });
 
-                        done();
+                done();
 
-                    });
+            });
 
         });
 
         it("should request with POST body", function(done) {
 
-            var data = { hello: "world" };
+            let data = { hello: "world" };
 
             request.post("/test")
-                    .send(data)
-                    .end(function(err, res) {
+            .send(data)
+            .end(function(err, res) {
 
-                        assert.ifError(err);
+                assert.ifError(err);
 
-                        assert.deepEqual(res.body, { body: data });
+                assert.deepEqual(res.body, { body: data });
 
-                        done();
+                done();
 
-                    });
+            });
 
         });
 
