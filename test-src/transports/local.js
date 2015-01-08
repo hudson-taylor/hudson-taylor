@@ -40,6 +40,27 @@ describe("Local Transport", function() {
 
     });
 
+    it("should ensure data is valid json", function(done) {
+
+      before(function() {
+        transport = new LOCAL();
+      });
+
+      let _server = new transport.Server(function(method, data, callback) {
+        assert.equal(typeof data.date, "string");
+        callback(null, { date: new Date() });
+      });
+
+      let _client = new transport.Client();
+
+      _client.call("something", { date: new Date() }, function(err, response) {
+        assert.ifError(err);
+        assert.equal(typeof response.date, "string");
+        done();
+      });
+
+    });
+
   });
 
 });
