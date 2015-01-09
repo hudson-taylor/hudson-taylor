@@ -52,9 +52,9 @@ describe("Service", function() {
   it("should call listen function on all transports", function(done) {
 
     let called = 0;
-    let _MockTransport2 = { Server() { return { listen(done) { called++; done(); } } } };
+    let _MockTransport = { Server() { return { listen(done) { called++; done(); } } } };
 
-    let transports = [ _MockTransport2, _MockTransport2, _MockTransport2 ];
+    let transports = [ _MockTransport, _MockTransport, _MockTransport ];
 
     let service = new Service(transports);
 
@@ -66,12 +66,81 @@ describe("Service", function() {
 
   });
 
+  it("should allow adding middleware", function() {
+
+    let _MockTransport = { Server() { return { listen(done) { called++; done(); } } } };
+
+    let service = new Service(_MockTransport);
+
+    service.before(() => {});
+    service.after(() => {});
+
+  });
+
+  it("should call all before middleware before method handler is called", function(done) {
+
+    let _data = {
+      hello: "world"
+    };
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.on("echo", function(request, callback) {
+      assert.deepEqual(request, _data);
+      done();
+    });
+
+    service.before(function(data, callback) {
+      assert.deepEqual(data, {});
+      callback(null, _data);
+    });
+
+    service.call("echo", {}, function(err, data) {
+      assert.ifError(err);
+    });
+
+  });
+
+  it("should call all after middlware before result is sent to transport", function(done) {
+
+    let _data = {
+      hello: "world"
+    };
+
+    let _data2 = {
+      something: "else"
+    };
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.on("echo", function(request, callback) {
+      assert.deepEqual(request, {});
+      return callback(null, _data);
+    });
+
+    service.after(function(data, callback) {
+      assert.deepEqual(data, _data);
+      return callback(null, _data2);
+    });
+
+    service.call("echo", {}, function(err, data) {
+      assert.ifError(err);
+      assert.deepEqual(data, _data2);
+      done();
+    });
+
+  });
+
   it("should call stop function on all transports", function(done) {
 
     let called = 0;
-    let _MockTransport3 = { Server() { return { stop(done) { called++; done(); } } } };
+    let _MockTransport = { Server() { return { stop(done) { called++; done(); } } } };
 
-    let transports = [ _MockTransport3, _MockTransport3 ];
+    let transports = [ _MockTransport, _MockTransport ];
 
     let service = new Service(transports);
 
@@ -84,3 +153,24 @@ describe("Service", function() {
   });
 
 });
+
+function mockTransport(fns) {
+    if(!fns) fns = {};
+    let ok = function(done) { done(); };
+    let server = function() {};
+    let client = function() {};
+    server.prototype.listen     = fns.listen     || ok;
+    server.prototype.stop       = fns.stop       || ok;
+    client.prototype.connect    = fns.connect    || ok;
+    client.prototype.disconnect = fns.disconnect || ok;
+    client.prototype.call       = fns.call || function(method, data, callback) {
+        callback(null, data);
+    };
+    let transport = function() {
+        return {
+            Client: client,
+            Server: server
+        };
+    };
+    return transport;
+}

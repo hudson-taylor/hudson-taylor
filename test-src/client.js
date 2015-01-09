@@ -109,6 +109,142 @@ describe("Client", function() {
 
     });
 
+    it("should allow adding middleware", function() {
+
+        let client = new Client({});
+
+        client.before(() => {});
+        client.after(() => {});
+
+    });
+
+    it("should call all before middleware before passed into transport", function(done) {
+
+        let _data = {
+            hello: "world"
+        };
+
+        let _data2 = {
+            something: "else"
+        };
+
+        let _data3 = {
+            even: "more"
+        };
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    assert.notDeepEqual(data, _data);
+                    assert.deepEqual(data, _data3);
+                    done();
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, _data);
+            return callback(null, _data2);
+        });
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, _data2);
+            return callback(null, _data3);
+        })
+
+        client.call("test1", "", _data, function(err) {
+            assert.ifError(err);
+        });
+
+    });
+
+    it("should call all after before result is given back to client", function(done) {
+
+        let _data = {
+            hello: "world"
+        };
+
+        let _data2 = {
+            something: "else"
+        };
+
+        let _data3 = {
+            even: "more"
+        };
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, {});
+                    return callback(null, _data);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, _data);
+            return callback(null, _data2);
+        });
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, _data2);
+            return callback(null, _data3);
+        });
+
+        client.call("test1", "", {}, function(err, result) {
+            assert.ifError(err);
+            assert.deepEqual(result, _data3);
+            done();
+        });
+
+    });
+
+    it("should be able to mix middleware", function(done) {
+
+        let _data = {
+            hello: "world"
+        };
+
+        let _data2 = {
+            something: "else"
+        };
+
+        let _data3 = {
+            even: "more"
+        };
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, _data);
+                    return callback(null, _data2);
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, {});
+            return callback(null, _data);
+        });
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, _data2);
+            return callback(null, _data3);
+        });
+
+        client.call("test1", "", {}, function(err, response) {
+            assert.ifError(err);
+            assert.deepEqual(response, _data3);
+            done();
+        });
+
+    });
 
     it("should call disconnect on all services passed into client", function(done) {
 
@@ -137,19 +273,19 @@ describe("Client", function() {
 function mockTransport(fns) {
     if(!fns) fns = {};
     let ok = function(done) { done(); };
-    let service = function() {};
+    let server = function() {};
     let client = function() {};
-    service.prototype.listen    = ok;
-    service.prototype.stop      = ok;
-    client.prototype.connect    = ok;
-    client.prototype.disconnect = ok;
-    client.prototype.call = function(method, data, callback) {
+    server.prototype.listen     = fns.listen     || ok;
+    server.prototype.stop       = fns.stop       || ok;
+    client.prototype.connect    = fns.connect    || ok;
+    client.prototype.disconnect = fns.disconnect || ok;
+    client.prototype.call       = fns.call || function(method, data, callback) {
         callback(null, data);
     };
     let transport = function() {
         return {
-            Client:  client,
-            Service: service
+            Client: client,
+            Server: server
         };
     };
     return transport;

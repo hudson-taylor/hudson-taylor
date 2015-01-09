@@ -7,8 +7,13 @@ const async  = require("async");
 
 let Client = function Client(services) {
 
-    this.services = {};
+    this.services    = {};
     this.connections = {};
+
+    this.middleware  = {
+        before: [],
+        after:  []
+    };
 
     for(let service in services) {
         if(services.hasOwnProperty(service)) {
@@ -75,14 +80,68 @@ Client.prototype.call = function(service, method, data, callback) {
         return callback({ error: "unknown-service" });
     }
 
-    conn.call(method, data, function(err, data) {
+    let _beforeMiddleware = self.middleware.before.filter((m) => {
+        if(m.service && m.service !== service) return false;
+        if(m.method  && m.method  !== method)  return false;
+        return true;
+    });
+
+    async.eachSeries(_beforeMiddleware, function(middleware, done) {
+        middleware.fn(data, function(err, result) {
+            if(err) {
+                return done(err);
+            }
+            data = result;
+            done();
+        });
+    }, function(err) {
         if(err) {
             return callback(err);
         }
-        self.emit("called", service, method);
-        callback(null, data);
+        conn.call(method, data, function(err, data) {
+            if(err) {
+                return callback(err);
+            }
+            let _afterMiddleware = self.middleware.after.filter((m) => {
+                if(m.service && m.service !== service) return false;
+                if(m.method  && m.method  !== method)  return false;
+                return true;
+            });
+            async.eachSeries(_afterMiddleware, function(middleware, done) {
+                middleware.fn(data, function(err, result) {
+                    if(err) {
+                        return done(err);
+                    }
+                    data = result;
+                    done();
+                });
+            }, function(err) {
+                if(err) {
+                    return callback(err);
+                }
+                self.emit("called", service, method);
+                callback(null, data);
+            });
+        });
     });
 
 };
+
+Client.prototype.before = function(fn, opts = {}) {
+    let { service, method } = opts;
+    this.middleware.before.push({
+        service,
+        method,
+        fn
+    });
+}
+Client.prototype.after = function(fn, opts = {}) {
+    let { service, method } = opts;
+    this.middleware.after.push({
+        service,
+        method,
+        fn
+    });
+}
 
 export default Client;
