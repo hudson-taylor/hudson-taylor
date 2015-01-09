@@ -5,6 +5,18 @@ const assert = require("assert");
 
 const Client = require("../lib/client");
 
+const _data = {
+    hello: "world"
+};
+
+const _data2 = {
+    something: "else"
+};
+
+const _data3 = {
+    even: "more"
+};
+
 describe("Client", function() {
 
     it("should add initial services on created", function() {
@@ -120,18 +132,6 @@ describe("Client", function() {
 
     it("should call all before middleware before passed into transport", function(done) {
 
-        let _data = {
-            hello: "world"
-        };
-
-        let _data2 = {
-            something: "else"
-        };
-
-        let _data3 = {
-            even: "more"
-        };
-
         let services = {
             test1: mockTransport({
                 call(method, data, callback) {
@@ -161,18 +161,6 @@ describe("Client", function() {
     });
 
     it("should call all after before result is given back to client", function(done) {
-
-        let _data = {
-            hello: "world"
-        };
-
-        let _data2 = {
-            something: "else"
-        };
-
-        let _data3 = {
-            even: "more"
-        };
 
         let services = {
             test1: mockTransport({
@@ -205,18 +193,6 @@ describe("Client", function() {
 
     it("should be able to mix middleware", function(done) {
 
-        let _data = {
-            hello: "world"
-        };
-
-        let _data2 = {
-            something: "else"
-        };
-
-        let _data3 = {
-            even: "more"
-        };
-
         let services = {
             test1: mockTransport({
                 call(method, data, callback) {
@@ -242,6 +218,108 @@ describe("Client", function() {
             assert.ifError(err);
             assert.deepEqual(response, _data3);
             done();
+        });
+
+    });
+
+    it("should only call middleware for matching services", function(done) {
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, _data);
+                    return callback(null, data);
+                }
+            })(),
+            test2: mockTransport({
+                call(method, data, callback) {
+                    return callback(null, data);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, {});
+            return callback(null, _data);
+        }, {
+            service: "test1"
+        });
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, {});
+            return callback(null, _data2);
+        }, {
+            service: "test2"
+        });
+
+        client.call("test1", "echo", {}, function(err, response) {
+            assert.ifError(err);
+
+            assert.deepEqual(response, _data);
+
+            client.call("test2", "echo", {}, function(err, response) {
+                assert.ifError(err);
+
+                assert.deepEqual(response, _data2);
+
+                done();
+
+            });
+
+        });
+
+    });
+
+    it("should only call middleware for matching methods", function(done) {
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, _data);
+                    return callback(null, data);
+                }
+            })(),
+            test2: mockTransport({
+                call(method, data, callback) {
+                    return callback(null, data);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, {});
+            return callback(null, _data);
+        }, {
+            service: "test1",
+            method:  "echo"
+        });
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, {});
+            return callback(null, _data2);
+        }, {
+            service: "test2",
+            method:  "wrongMethodName"
+        });
+
+        client.call("test1", "echo", {}, function(err, response) {
+            assert.ifError(err);
+
+            assert.deepEqual(response, _data);
+
+            client.call("test2", "echo", {}, function(err, response) {
+                assert.ifError(err);
+
+                assert.deepEqual(response, {});
+
+                done();
+
+            });
+
         });
 
     });

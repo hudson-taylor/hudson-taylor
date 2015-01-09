@@ -6,6 +6,18 @@ const s      = require('ht-schema');
 
 const Service = require('../lib/service');
 
+const _data = {
+  hello: "world"
+};
+
+const _data2 = {
+  something: "else"
+};
+
+const _data3 = {
+  even: "more"
+};
+
 describe("Service", function() {
 
   let _MockTransport = { Server() { } };
@@ -79,10 +91,6 @@ describe("Service", function() {
 
   it("should call all before middleware before method handler is called", function(done) {
 
-    let _data = {
-      hello: "world"
-    };
-
     let transport = mockTransport();
 
     let service = new Service(transport());
@@ -103,15 +111,7 @@ describe("Service", function() {
 
   });
 
-  it("should call all after middlware before result is sent to transport", function(done) {
-
-    let _data = {
-      hello: "world"
-    };
-
-    let _data2 = {
-      something: "else"
-    };
+  it("should call all after middleware before result is sent to transport", function(done) {
 
     let transport = mockTransport();
 
@@ -134,6 +134,83 @@ describe("Service", function() {
     });
 
   });
+
+  it("should be able to mix middleware", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.on("echo", function(request, callback) {
+      assert.deepEqual(request, _data);
+      return callback(null, _data2);
+    });
+
+    service.before(function(data, callback) {
+      assert.deepEqual(data, {});
+      return callback(null, _data);
+    });
+
+    service.after(function(data, callback) {
+      assert.deepEqual(data, _data2);
+      return callback(null, _data3);
+    });
+
+    service.call("echo", {}, function(err, data) {
+      assert.ifError(err);
+      assert.deepEqual(data, _data3);
+      done();
+    });
+
+  });
+
+  it("should only call middleware for matching methods", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.before(function(data, callback) {
+      assert.deepEqual(data, {});
+      return callback(null, _data);
+    }, {
+      method: "echo1"
+    });
+
+    service.on("echo1", function(request, callback) {
+      assert.deepEqual(request, _data);
+      return callback(null, request);
+    });
+
+    service.on("echo2", function(request, callback) {
+      assert.deepEqual(request, {});
+      return callback(null, _data2);
+    });
+
+    service.after(function(data, callback) {
+      assert.deepEqual(data, _data2);
+      return callback(null, _data3);
+    }, {
+      method: "echo2"
+    });
+
+    service.call("echo1", {}, function(err, response) {
+      assert.ifError(err);
+
+      assert.deepEqual(response, _data);
+
+      service.call("echo2", {}, function(err, response) {
+        assert.ifError(err);
+
+        assert.deepEqual(response, _data3);
+
+        done();
+
+      });
+
+    });
+
+  })
 
   it("should call stop function on all transports", function(done) {
 
