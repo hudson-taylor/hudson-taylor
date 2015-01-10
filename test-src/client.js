@@ -54,6 +54,20 @@ describe("Client", function() {
         });
     });
 
+    it("should return error if calling unknown service", function(done) {
+
+        let client = new Client({});
+
+        client.call("invalid", "method", {}, function(err) {
+
+            assert.equal(err.error, "unknown-service");
+
+            done();
+
+        });
+
+    });
+
     it("should be able to call methods", function(done) {
         let services = {
             "test1": mockTransport()({}),

@@ -34,7 +34,6 @@ var expressProxy = function(remote, serviceName, signal) {
 
 };
 
-
 var merge = function merge() {
 
     // Merge objects passed as arguments, left to right precidence.
@@ -55,7 +54,16 @@ var merge = function merge() {
 
 };
 
+var formatError = function formatError(err) {
+    if(err.error) return err;
+    if(err instanceof Error) {
+        err = err.message || err.toString();
+    }
+    return { error: err };
+}
+
 export {
     expressProxy,
-    merge
+    merge,
+    formatError
 }

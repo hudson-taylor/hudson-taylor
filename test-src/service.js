@@ -78,6 +78,62 @@ describe("Service", function() {
 
   });
 
+  it("should return error if calling unknown method", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.call("unknown", {}, function(err) {
+
+      assert.equal(err.error, "unknown-method");
+
+      done();
+
+    });
+
+  });
+
+  it("should return error if data does not match schema", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.on("double", { number: s.Number() }, function(request, callback) {
+      return callback(null, request.number * 2);
+    });
+
+    service.call("double", { number: "hello" }, function(err) {
+
+      assert.equal(err.error, "Failed to parse schema.number: required Number, received string");
+
+      done();
+
+    });
+
+  });
+
+  it("should inject dependencies into method handlers", function(done) {
+
+    let config = {
+      a: 5
+    };
+
+    let transport = mockTransport();
+
+    let service = new Service(transport(), config);
+
+    service.on("echo", function(request, callback, something, a) {
+      assert.equal(something, undefined);
+      assert.equal(a, config.a);
+      done();
+    });
+
+    service.call("echo", {});
+
+  });
+
   it("should allow adding middleware", function() {
 
     let _MockTransport = { Server() { return { listen(done) { called++; done(); } } } };

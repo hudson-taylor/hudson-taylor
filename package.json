@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "2.1.0",
+  "version": "2.3.0",
   "description": "Library for building services.",
   "main": "index.js",
   "directories": {
@@ -10,6 +10,7 @@
   "scripts": {
     "test": "npm run build && mocha --recursive --reporter spec --bail --check-leaks test/",
     "build": "node ./node_modules/6to5/bin/6to5 src -d lib && node ./node_modules/6to5/bin/6to5 test-src -d test",
+    "coverage": "npm run build && ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd --recursive -R spec -t 5000",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -42,12 +43,13 @@
     "async": "^0.9.0",
     "body-parser": "^1.8.2",
     "express": "^4.9.0",
-    "ht-schema": "^0.0.5",
+    "ht-schema": "^0.0.7",
     "request": "^2.42.0",
     "uid2": "0.0.3"
   },
   "devDependencies": {
     "6to5": "^2.4.10",
+    "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
     "openport": "0.0.3",
     "supertest": "^0.14.0"

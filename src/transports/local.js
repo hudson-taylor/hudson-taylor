@@ -1,6 +1,12 @@
 
 "use strict";
 
+const path = require("path");
+
+const utils = require(path.resolve(__dirname, "../utils"));
+
+const formatError = utils.formatError;
+
 let fn;
 
 function LocalTransportServer(_fn) {
@@ -32,15 +38,15 @@ LocalTransportClient.prototype.call = function(method, data, callback) {
     // both the input, and the response from the service
     forceJSON(data, function(err, data) {
         if(err) {
-            return callback(err);
+            return callback(formatError(err));
         }
         fn(method, data, function(err, response) {
             if(err) {
-                return forceJSON(err, function(err2, data) {
+                return forceJSON(formatError(err), function(err2, data) {
                     if(err2) {
-                        return callback(err2);
+                        return callback(formatError(err2));
                     }
-                    return callback(data)
+                    return callback(formatError(data)); // data is still an error in this instance
                 });
             }
             forceJSON(response, callback);

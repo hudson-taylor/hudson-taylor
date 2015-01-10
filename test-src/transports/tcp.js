@@ -43,6 +43,27 @@ describe("TCP Transport", function() {
 			assert.equal(server instanceof transport.Server, true);
 		});
 
+		it("should return error if server cannot bind to port", function(done) {
+
+			let netServer = net.createServer(() => {});
+
+			netServer.listen(port, host, function(err) {
+				assert.ifError(err);
+
+				let server = new transport.Server();
+
+				server.listen(function(err) {
+
+					assert.equal(err.errno, "EADDRINUSE");
+
+					netServer.close(done);
+
+				});
+
+			});
+
+		});
+
 		it("should start server when listen is called", function(done) {
 
 			server.listen(function(err) {
@@ -66,7 +87,34 @@ describe("TCP Transport", function() {
 
 		});
 
-		it("should stop server when stop is called", function(done) {
+		it("should return error if there was a problem stopping server", function(done) {
+
+			// Pull server instance off so we can replace
+			// it and restore it later.
+			let __server = server.server;
+
+			let _err = "error oh no";
+
+			server.server = {
+				close(cb) {
+					cb(_err);
+				}
+			};
+
+			server.stop(function(err) {
+
+				assert.equal(err, _err);
+
+				// Restore server instance
+				server.server = __server;
+
+				done();
+
+			});
+
+		});
+
+		it("should stop server successfully when stop is called", function(done) {
 
 			server.stop(function(err) {
 				assert.ifError(err);
@@ -80,30 +128,47 @@ describe("TCP Transport", function() {
 
 		});
 
+		it("should call callback even if not listening when stop is called", function(done) {
+
+			server.stop(function(err) {
+				assert.ifError(err);
+				done();
+			});
+
+		});
+
 		it("should call fn when request is received", function(done) {
 
 			let _method = "echo";
 			let _data   = { hello: "world" };
+			let _data2  = { something: "else" };
 
 			server = new transport.Server(function(method, data, callback) {
 				assert.equal(method, _method);
 				assert.deepEqual(data, _data);
-				server.stop(done);
-				done();
+				callback(null, _data2);
 			});
 
 			server.listen(function(err) {
 				assert.ifError(err);
 
-				var request = JSON.stringify({
+				let request = JSON.stringify({
 					id:   1,
 					name: _method,
 					data: _data
 				});
 
-				var clientSocket = net.createConnection(port, host);
+				let clientSocket = net.createConnection(port, host);
 				clientSocket.setEncoding("utf8");
 				clientSocket.write(request);
+
+				clientSocket.on("data", function(_response) {
+					clientSocket.end();
+					let response = JSON.parse(_response);
+					assert.ifError(response.error);
+					assert.deepEqual(response.data, _data2);
+					server.stop(done);
+				});
 
 			});
 
@@ -116,6 +181,20 @@ describe("TCP Transport", function() {
 		it("should have created client", function() {
 			let client = new transport.Client();
 			assert.equal(client instanceof transport.Client, true);
+		});
+
+		it("should return error if not connected", function(done) {
+
+			let client = new transport.Client();
+
+			client.call("method", {}, function(err) {
+
+				assert.deepEqual(err.error, "disconnected");
+
+				done();
+
+			});
+
 		});
 
 		it("should create connection when connect is called", function(done) {
@@ -169,6 +248,76 @@ describe("TCP Transport", function() {
 
 		});
 
+		it("should drop unknown responses from server", function(done) {
+
+			let netServer = net.createServer(function(socket) {
+				socket.end(JSON.stringify({
+					id:    "invalid",
+					error: null,
+					data:  {}
+				}));
+			});
+
+			let client = new transport.Client();
+
+			netServer.listen(port, host, function(err) {
+				assert.ifError(err);
+
+				client.connect(function(err) {
+					assert.ifError(err);
+				
+					client.call("", {}, function(err) {
+						assert.fail(null, null, "should not have called callback");
+					});
+
+					setTimeout(function() {
+						netServer.close(done);
+					}, 200);
+
+				});
+				
+			});
+
+		});
+
+		it("should return error if server does", function(done) {
+
+			let _err = "err!";
+
+			let netServer = net.createServer(function(socket) {
+				socket.setEncoding("utf8");
+				socket.on("data", function(_data) {
+					var data = JSON.parse(_data);
+					socket.end(JSON.stringify({
+						id:    data.id,
+						data:  null,
+						error: _err
+					}));
+				});
+			});
+
+			let client = new transport.Client();
+
+			netServer.listen(port, host, function(err) {
+				assert.ifError(err);
+
+				client.connect(function(err) {
+					assert.ifError(err);
+				
+					client.call("", {}, function(err) {
+						
+						assert.equal(err, _err);
+
+						netServer.close(done);
+
+					});
+
+				});
+				
+			});
+
+		});
+
 		it("should disconnect connection when disconnect is called", function(done) {
 
 			let netServer = net.createServer(function(socket) {
@@ -187,6 +336,17 @@ describe("TCP Transport", function() {
 						assert.ifError(err);
 					});
 				});
+			});
+
+		});
+
+		it("should call disconnect callback even if not connected", function(done) {
+
+			let client = new transport.Client();
+
+			client.disconnect(function(err) {
+				assert.ifError(err);
+				done();
 			});
 
 		});

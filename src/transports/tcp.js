@@ -27,14 +27,16 @@ function TCPTransportServer(config) {
 
     _TCPTransportServer.prototype.listen = function(done) {
         let self = this;
+
         if(this.listening) {
             return done();
         }
 
-        this.server.listen(config.port, config.host, function(err) {
-            if(err) {
-                return done(err);
-            }
+        this.server.once("error", function(err) {
+            return done(err);
+        });
+
+        this.server.listen(config.port, config.host, function() {
             self.listening = true;
             done();
         });

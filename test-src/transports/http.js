@@ -81,6 +81,17 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should still call callback if server is not listening", function(done) {
+
+			server.stop(function(err) {
+				assert.ifError(err);
+
+				done();
+
+			});
+
+		});
+
 		it("should call fn when request is received", function(done) {
 
 			let _method = "echo";
@@ -109,6 +120,34 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should return error if fn does", function(done) {
+
+			let _err = "err!";
+
+			server = new transport.Server(function(method, data, callback) {
+				return callback(_err);
+			});
+
+			server.listen(function(err) {
+				assert.ifError(err);
+
+				request({
+					url:    "http://" + host + ":" + port + "/ht",
+					method: "POST",
+					json:   {}
+				}, function(e, r, body) {
+					assert.ifError(e);
+					
+					assert.equal(body.error, _err);
+
+					server.stop(done);
+
+				});
+
+			});
+
+		});
+
 	});
 
 	describe("Client", function() {
@@ -116,6 +155,17 @@ describe("HTTP Transport", function() {
 		it("should have created client", function() {
 			let client = new transport.Client();
 			assert.equal(client instanceof transport.Client, true);
+		});
+
+		it("should provide noop'd versions of unused methods", function() {
+
+			let noop = () => {};
+
+			let client = new transport.Client();
+
+			client.connect(noop);
+			client.disconnect(noop);
+
 		});
 
 		it("should be able to call method", function(done) {
@@ -141,6 +191,52 @@ describe("HTTP Transport", function() {
 					_server.close(done);
 				});
 			});
+
+		});
+
+		it("should return error if request cannot be made", function(done) {
+
+			let client = new transport.Client();
+
+			client.url = "http://127.0.0.1:1/";
+
+			client.call("", {}, function(err) {
+
+				assert.equal(err.errno, "ECONNREFUSED");
+
+				done();
+
+			});
+
+		});
+
+		it("should generate correct url when custom endpoint is set", function() {
+
+			let _path = "/custom";
+
+			let transport = new HTTP({
+				port,
+				host,
+				path: "/custom"
+			});
+
+			let client = new transport.Client();
+
+			assert.equal(client.url, "http://" + host + ":" + port + _path);
+
+		});
+
+		it("should generate correct url when SSL is enabled", function() {
+
+			let transport = new HTTP({
+				port,
+				host,
+				ssl: true 
+			});
+
+			let client = new transport.Client();
+
+			assert.equal(client.url, "https://" + host + ":" + port + "/ht");
 
 		});
 

@@ -71,7 +71,7 @@ function HTTPTransportClient(config) {
     let _HTTPTransportClient = function() {
         // An instance of _HTTPTransportClient is created
         // when this transport is passed into ht.Client.
-        // Here, we can setup persistent connects (see tcp transport)
+        // Here, we can setup persistent connections (see tcp transport)
         // and do configuration.
         this.url = "http" + (config.ssl ? "s" : "") + "://" + config.host + ":" + config.port + (config.path || "/ht");
     };
