@@ -1,6 +1,9 @@
 hudson-taylor
 =============
 
+[![Build Status](https://travis-ci.org/hudson-taylor/hudson-taylor.svg?branch=2)](https://travis-ci.org/hudson-taylor/hudson-taylor)
+[![Coverage Status](https://img.shields.io/coveralls/hudson-taylor/hudson-taylor.svg)](https://coveralls.io/r/hudson-taylor/hudson-taylor)
+
 Hudson Taylor (ht) is a client/server library for building automatically
 documented, well validated services (SOA) in Node.js
 
