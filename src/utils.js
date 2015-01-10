@@ -23,9 +23,8 @@ var expressProxy = function(remote, serviceName, signal) {
             let payload = exports.merge.apply(null, bits);
             remote.call(serviceName, signal, payload, function(err, data) {
                 if(err) {
-                    return res.status(500).json(err instanceof Error ? err.toString() : err);
+                    return res.status(500).json(formatError(err));
                 }
-                res.set({ "Content-Type": "application/json" });
                 return res.json(data);
             });
         };

@@ -16,9 +16,8 @@ let Client = function Client(services) {
     };
 
     for(let service in services) {
-        if(services.hasOwnProperty(service)) {
-            this.add(service, services[service]);
-        }
+        if(!services.hasOwnProperty(service)) continue;        
+        this.add(service, services[service]);
     }
 
 };
@@ -40,7 +39,7 @@ Client.prototype.connect = function(done) {
 
     async.each(Object.keys(this.services), function(name, cb) {
 
-        self.connections[name].connect(function(err){ 
+        self.connections[name].connect(function(err) { 
             if(err) {
                 return cb(err);
             }

@@ -28,6 +28,10 @@ describe("Utilities", function() {
                 return callback(null, { body: data });
             });
 
+            service.on("emitError", function(data, callback) {
+                return callback("oops");
+            });
+
             client = new Client({
                 s: transport
             });
@@ -39,12 +43,49 @@ describe("Utilities", function() {
 
         });
 
+        it("should gather payload properly", function(done) {
+
+            let req = {
+                body: {
+                    a: 5
+                },
+                params: {
+                    a: 10,
+                    b: 15
+                },
+                query: {
+                    a: 20,
+                    b: 25,
+                    c: 30
+                }
+            };
+
+            let merged = {
+                a: 5,
+                b: 15,
+                c: 30
+            };
+
+            let client = {
+                call(service, method, data, callback) {
+                    assert.deepEqual(data, merged);
+                    done();
+                }
+            }
+
+            utils.expressProxy(client, "", "")(req);
+
+        });
+
+
         it("should add middleware properly", function() {
 
-            let fn = utils.expressProxy(client, "s", "data");
+            let fn    = utils.expressProxy(client, "s", "data");
+            let errFn = utils.expressProxy(client, "s", "emitError");
 
             app.post("/test", fn);
             app.get("/test", fn);
+            app.post("/error", errFn);
 
         });
 
@@ -52,7 +93,6 @@ describe("Utilities", function() {
 
             request.get("/test?hello=world")
             .end(function(err, res) {
-
                 assert.ifError(err);
 
                 assert.deepEqual(res.body, { body: { hello: "world" } });
@@ -70,7 +110,6 @@ describe("Utilities", function() {
             request.post("/test")
             .send(data)
             .end(function(err, res) {
-
                 assert.ifError(err);
 
                 assert.deepEqual(res.body, { body: data });
@@ -78,6 +117,89 @@ describe("Utilities", function() {
                 done();
 
             });
+
+        });
+
+        it("should return 500 if services returned 500", function(done) {
+
+            request.post("/error")
+            .send({})
+            .end(function(err, res) {
+                assert.ifError(err);
+
+                assert.notEqual(res.body.error, undefined);
+
+                done();
+
+            });
+
+        });
+
+    });
+
+    describe("merge", function() {
+
+        it("should merge", function() {
+
+            var data1 = { a: 5         };
+            var data2 = { a: 15, b: 10 };
+
+            var result = utils.merge(data1, data2);
+
+            assert.deepEqual(result, {
+                a: data1.a,
+                b: data2.b
+            });
+
+        });
+
+    });
+
+    describe("formatError", function() {
+
+        it("should return object", function() {
+
+            let str = "err1234";
+
+            let data = utils.formatError(str);
+
+            assert.deepEqual(data, {
+                error: str
+            });
+
+        });
+
+        it("should convert Error instance to object", function() {
+
+            let str = "err1234";
+
+            let err = new Error(str);
+
+            let data = utils.formatError(err);
+
+            assert.deepEqual(data, {
+                error: str
+            });
+
+            let err2 = new Error();
+
+            let data2 = utils.formatError(err2);
+
+            assert.deepEqual(data2, {
+                error: "Error"
+            });
+
+        });
+
+        it("should not do anything if data has an error variable", function() {
+
+            let _data = {
+                error: "something"
+            };
+
+            let data = utils.formatError(_data);
+
+            assert.deepEqual(data, _data);
 
         });
 

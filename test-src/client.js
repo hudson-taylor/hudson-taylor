@@ -17,6 +17,8 @@ const _data3 = {
     even: "more"
 };
 
+const _err = new Error("oopsies!");
+
 describe("Client", function() {
 
     it("should add initial services on created", function() {
@@ -31,6 +33,22 @@ describe("Client", function() {
         let client = new Client(services);
 
         assert.equal(called, Object.keys(services).length);
+
+    });
+
+    it("should ignore prototypal variables in services object", function() {
+
+        let _services = {
+            x: 1 // invalid
+        };
+
+        let services = Object.create(_services);
+
+        services.test1 = mockTransport()();
+
+        let client = new Client(services);
+
+        assert.equal(Object.keys(client.services).length, 1);
 
     });
 
@@ -52,6 +70,28 @@ describe("Client", function() {
         client.connect(function(err) {
             assert.ifError(err);
         });
+    });
+
+    it("should return error if transport returns error connecting", function(done) {
+
+        let services = {
+            "test1": mockTransport({
+                connect(cb) {
+                    cb(_err);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        client.connect(function(err) {
+
+            assert.equal(err.message, _err.message);
+
+            done();
+
+        });
+
     });
 
     it("should return error if calling unknown service", function(done) {
@@ -135,6 +175,41 @@ describe("Client", function() {
 
     });
 
+    it("should pass result back to fn", function(done) {
+
+        let services = {
+            test1: mockTransport()()
+        }
+
+        let client = new Client(services);
+
+        client.call("test1", "echo", _data2, function(err, response) {
+            assert.ifError(err);
+            assert.deepEqual(response, _data2);
+            done();
+        });
+
+    });
+
+    it("should return error if service does", function(done) {
+
+        let services = {
+            test1: mockTransport({
+                call(method, data, callback) {
+                    return callback(_err);
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.call("test1", "echo", _data, function(err) {
+            assert.equal(err.message, _err.message);
+            done();
+        });
+
+    });
+
     it("should allow adding middleware", function() {
 
         let client = new Client({});
@@ -174,7 +249,7 @@ describe("Client", function() {
 
     });
 
-    it("should call all after before result is given back to client", function(done) {
+    it("should call all after middleware before result is given back to client", function(done) {
 
         let services = {
             test1: mockTransport({
@@ -305,6 +380,12 @@ describe("Client", function() {
         let client = new Client(services);
 
         client.before(function(data, callback) {
+            return callback(null, data);
+        }, {
+            method: "nope!"
+        });
+        
+        client.before(function(data, callback) {
             assert.deepEqual(data, {});
             return callback(null, _data);
         }, {
@@ -338,6 +419,52 @@ describe("Client", function() {
 
     });
 
+    it("should return error if middleware does (before)", function(done) {
+
+        let services = {
+            test1: mockTransport()()
+        }
+
+        let client = new Client(services);
+
+        client.before(function(data, callback) {
+            assert.deepEqual(data, _data);
+            return callback(_err);
+        });
+
+        client.call("test1", "", _data, function(err) {
+
+            assert.equal(err.message, _err.message);
+
+            done();
+
+        });
+
+    });
+
+    it("should return error if middleware does (after)", function(done) {
+
+        let services = {
+            test1: mockTransport()()
+        }
+
+        let client = new Client(services);
+
+        client.after(function(data, callback) {
+            assert.deepEqual(data, _data);
+            return callback(_err);
+        });
+
+        client.call("test1", "", _data, function(err) {
+
+            assert.equal(err.message, _err.message);
+
+            done();
+
+        });
+
+    });
+
     it("should call disconnect on all services passed into client", function(done) {
 
         let called = 0;
@@ -356,6 +483,30 @@ describe("Client", function() {
             assert.ifError(err);
             assert.equal(called, Object.keys(services).length);
             done();
+        });
+
+    });
+
+    it("should return error if transport returns error disconnecting", function(done) {
+
+        let _err = new Error("oops");
+
+        let services = {
+            "test1": mockTransport({
+                disconnect(cb) {
+                    cb(_err);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        client.disconnect(function(err) {
+
+            assert.equal(err.message, _err.message);
+
+            done();
+
         });
 
     });

@@ -272,7 +272,7 @@ describe("TCP Transport", function() {
 
 					setTimeout(function() {
 						netServer.close(done);
-					}, 200);
+					}, 50);
 
 				});
 				

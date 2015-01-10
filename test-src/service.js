@@ -18,6 +18,8 @@ const _data3 = {
   even: "more"
 };
 
+const _err = new Error("oopsies!");
+
 describe("Service", function() {
 
   let _MockTransport = { Server() { } };
@@ -266,7 +268,51 @@ describe("Service", function() {
 
     });
 
-  })
+  });
+
+  it("should return error if middleware does (before)", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.before(function(data, callback) {
+      assert.deepEqual(data, _data);
+      return callback(_err);
+    });
+
+    service.on("echo", function(request, callback) {
+      return callback(null, request);
+    });
+
+    service.call("echo", _data, function(err) {
+      assert.equal(err.message, _err.message);
+      done();
+    });
+
+  });
+
+  it("should return error if middleware does (after)", function(done) {
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.after(function(data, callback) {
+      assert.deepEqual(data, _data);
+      return callback(_err);
+    });
+
+    service.on("echo", function(request, callback) {
+      return callback(null, request);
+    });
+
+    service.call("echo", _data, function(err) {
+      assert.equal(err.message, _err.message);
+      done();
+    });
+
+  });
 
   it("should call stop function on all transports", function(done) {
 
