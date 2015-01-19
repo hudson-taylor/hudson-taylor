@@ -22,8 +22,6 @@ const _err = new Error("oopsies!");
 
 describe("Service", function() {
 
-  let _MockTransport = { Server() { } };
-
   it("should allow passing no transport", function() {
 
     let service = new Service();
@@ -59,7 +57,7 @@ describe("Service", function() {
   
   it("should allow passing single transport", function() {
 
-    let service = new Service(_MockTransport);
+    let service = new Service(mockTransport()());
 
     assert.equal(service._servers.length, 1);
 
@@ -72,7 +70,7 @@ describe("Service", function() {
       let transports = [];
 
       for(let i = 0; i < n; i++) {
-        transports.push(_MockTransport);
+        transports.push(mockTransport()());
       }
 
       let service = new Service(transports);
@@ -85,7 +83,7 @@ describe("Service", function() {
 
   it("should allow listening for methods", function() {
 
-    let service = new Service(_MockTransport);
+    let service = new Service(mockTransport()());
 
     assert.equal(typeof service.on, "function");
 
@@ -99,9 +97,15 @@ describe("Service", function() {
   it("should call listen function on all transports", function(done) {
 
     let called = 0;
-    let _MockTransport = { Server() { return { listen(done) { called++; done(); } } } };
 
-    let transports = [ _MockTransport, _MockTransport, _MockTransport ];
+    let transport = mockTransport({
+      listen(done) {
+        called++;
+        done();
+      }
+    });
+
+    let transports = [ transport(), transport(), transport() ];
 
     let service = new Service(transports);
 
@@ -258,9 +262,7 @@ describe("Service", function() {
 
   it("should allow adding middleware", function() {
 
-    let _MockTransport = { Server() { return { listen(done) { called++; done(); } } } };
-
-    let service = new Service(_MockTransport);
+    let service = new Service(mockTransport()());
 
     service.before(() => {});
     service.after(() => {});
@@ -448,21 +450,14 @@ describe("Service", function() {
   it("should call stop function on all transports", function(done) {
 
     let called = 0;
-    let _MockTransport = { 
-      Server() { 
-        return { 
-          stop(done) { 
-            called++; 
-            done();
-          },
-          listen(done) { 
-            done();
-          }
-        };
+    let transport = mockTransport({
+      stop(done) {
+        called++;
+        done();
       }
-    };
+    });
 
-    let transports = [ _MockTransport, _MockTransport ];
+    let transports = [ transport(), transport() ];
 
     let service = new Service(transports);
 
