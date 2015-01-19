@@ -7,18 +7,25 @@ const s       = require("ht-schema");
 let Service = function Service(Transports, config) {
     let self = this;
 
+    if(typeof (Transports||{}).Server == 'function') {
+        Transports = [ Transports ];
+    } else if(typeof Transports == 'object' && !Array.isArray(Transports)) {
+        config = Transports;
+        Transports = [];
+    } else if(!Transports) {
+        Transports = [];
+        config = {};
+    }
+
     this.config      = config;
     this._methods    = {};
     this._servers    = [];
+    this.listening   = false;
 
     this._middleware = {
         before: [],
         after:  []
     };
-
-    if(!Array.isArray(Transports)) {
-        Transports = [ Transports ];
-    }
 
     this.fn = function(method, data, cb) {
         let _tmp = self._methods[method];
@@ -93,10 +100,20 @@ let Service = function Service(Transports, config) {
     };
 
     Transports.forEach(function(transport) {
-        self._servers.push(new transport.Server(self.fn));
+        self.addTransport(transport);
     });
 
 };
+
+Service.prototype.addTransport = function(transport, done = () => {}) {
+    let server = new transport.Server(this.fn);
+    this._servers.push(server);
+    if(this.listening) {
+        server.listen(done);
+    } else {
+        done();
+    }
+}
 
 Service.prototype.on = function(method, schema, fn) {
 
@@ -128,16 +145,32 @@ Service.prototype.after = function(fn, opts = {}) {
     });
 }
 
-Service.prototype.listen = function(done) {
+Service.prototype.listen = function(done = () => {}) {
+    let self = this;
+    if(self.listening) return done();
     async.each(this._servers, function(s, cb) {
         s.listen(cb);
-    }, done);
+    }, function(err) {
+        if(err) {
+            return done(err);
+        }
+        self.listening = true;
+        done();
+    });
 };
 
-Service.prototype.stop = function(done) {
+Service.prototype.stop = function(done = () => {}) {
+    let self = this;
+    if(!self.listening) return done();
     async.each(this._servers, function(s, cb) {
         s.stop(cb);
-    }, done);
+    }, function(err) {
+        if(err) {
+            return done(err);
+        }
+        self.listening = false;
+        done();
+    });
 };
 
 Service.prototype.call = function(method, data, cb) {

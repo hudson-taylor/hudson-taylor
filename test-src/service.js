@@ -23,6 +23,39 @@ const _err = new Error("oopsies!");
 describe("Service", function() {
 
   let _MockTransport = { Server() { } };
+
+  it("should allow passing no transport", function() {
+
+    let service = new Service();
+
+    assert.equal(service._servers.length, 0);
+
+  });
+
+  it("should allow passing in just config", function() {
+
+    let service = new Service(_data);
+
+    assert.deepEqual(service.config, _data);
+    assert.equal(service._servers.length, 0);
+
+  });
+
+  it("should allow adding transport after service has been created", function(done) {
+
+    let service = new Service();
+
+    let transport = mockTransport();
+
+    assert.equal(service._servers.length, 0);
+
+    service.addTransport(transport(), function(err) {
+      assert.ifError(err);
+      assert.equal(service._servers.length, 1);
+      done();
+    });
+
+  });
   
   it("should allow passing single transport", function() {
 
@@ -75,6 +108,93 @@ describe("Service", function() {
     service.listen(function(err) {
       assert.ifError(err); // This can't happen.. shrug
       assert.equal(called, transports.length);
+      done();
+    });
+
+  });
+
+  it("should not require callback passed to listen", function(done) {
+
+    let called = false;
+
+    let transport = mockTransport({
+      listen(done) {
+        called = true;
+        done();
+      }
+    });
+
+    let service = new Service(transport());
+
+    service.listen();
+
+    setTimeout(() => {
+      assert.equal(called, true);
+      done();
+    }, 100);
+
+  });
+
+  it("should set listening to true when listen is called", function(done) {
+
+    let service = new Service(mockTransport()());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+
+      assert.equal(service.listening, true);
+
+      done();
+
+    });
+
+  });
+
+  it("should immediately return if server is already listening", function(done) {
+
+    let service = new Service(mockTransport()());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+      service.listen(function(err) {
+        assert.ifError(err);
+        done();
+      });
+    });
+
+  });
+
+  it("should call listen on newly added transports if service is already listening", function(done) {
+
+    let mocked = mockTransport({
+      listen() {
+        done();
+      }
+    });
+
+    let service = new Service(mockTransport()());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+
+      service.addTransport(mocked());
+
+    });
+
+  });
+
+  it("should return error if there was an error listening", function(done) {
+
+    let transport = mockTransport({
+      listen(done) {
+        return done(_err);
+      }
+    });
+
+    let service = new Service(transport());
+
+    service.listen(function(err) {
+      assert.equal(err, _err);
       done();
     });
 
@@ -314,19 +434,108 @@ describe("Service", function() {
 
   });
 
+  it("should immediately return if server is not listening", function(done) {
+
+    let service = new Service(mockTransport()());
+
+    service.stop(function(err) {
+      assert.ifError(err);
+      done();
+    });
+
+  });
+
   it("should call stop function on all transports", function(done) {
 
     let called = 0;
-    let _MockTransport = { Server() { return { stop(done) { called++; done(); } } } };
+    let _MockTransport = { 
+      Server() { 
+        return { 
+          stop(done) { 
+            called++; 
+            done();
+          },
+          listen(done) { 
+            done();
+          }
+        };
+      }
+    };
 
     let transports = [ _MockTransport, _MockTransport ];
 
     let service = new Service(transports);
 
-    service.stop(function(err) {
-      assert.ifError(err); // This can't happen.. shrug
-      assert.equal(called, transports.length);
+    service.listen(function(err) {
+      assert.ifError(err);
+
+      service.stop(function(err) {
+        assert.ifError(err); // This can't happen.. shrug
+        assert.equal(called, transports.length);
+        done();
+      });
+
+    });
+
+  });
+
+  it("should not require callback passed to stop", function(done) {
+
+    let called = false;
+
+    let transport = mockTransport({
+      stop(done) {
+        called = true;
+        done();
+      }
+    });
+
+    let service = new Service(transport());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+      service.stop();
+    });
+
+    setTimeout(() => {
+      assert.equal(called, true);
       done();
+    }, 100);
+
+  });
+
+  it("should set listening to false when stop is called", function(done) {
+
+    let service = new Service(mockTransport()());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+      assert.equal(service.listening, true);
+      service.stop(function(err) {
+        assert.ifError(err);
+        assert.equal(service.listening, false);
+        done();
+      });
+    });
+
+  });
+
+  it("should return error if there was an error stopping", function(done) {
+
+    let transport = mockTransport({
+      stop(done) {
+        return done(_err);
+      }
+    });
+
+    let service = new Service(transport());
+
+    service.listen(function(err) {
+      assert.ifError(err);
+      service.stop(function(err) {
+        assert.equal(err, _err);
+        done();
+      });
     });
 
   });
