@@ -120,21 +120,6 @@ describe("Utilities", function() {
 
         });
 
-        it("should return 500 if services returned 500", function(done) {
-
-            request.post("/error")
-            .send({})
-            .end(function(err, res) {
-                assert.ifError(err);
-
-                assert.notEqual(res.body.error, undefined);
-
-                done();
-
-            });
-
-        });
-
     });
 
     describe("merge", function() {

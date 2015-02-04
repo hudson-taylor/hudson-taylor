@@ -65,6 +65,10 @@ let Service = function Service(Transports, config) {
 
             let finish = function(err, response) {
 
+                if(err) {
+                    return cb(err);
+                }
+
                 let _afterMiddleware = self._middleware.after.filter((m) => {
                     if(m.method && m.method !== method) return false;
                     return true;
@@ -91,6 +95,7 @@ let Service = function Service(Transports, config) {
             let _s = _tmp.fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
             /* istanbul ignore next */
             let args = _s.slice(_s.indexOf('(') + 1, _s.indexOf(')')).match(/([^\s,]+)/g) || [];
+
             _tmp.fn.apply(_tmp, [data, finish].concat(args.slice(2).map(function(a) {
                 return config[a];
             })));

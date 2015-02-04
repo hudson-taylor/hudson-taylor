@@ -1,72 +1,93 @@
 
 "use strict";
 
-const path = require("path");
+var path = require("path");
 
-const utils = require(path.resolve(__dirname, "../utils"));
+var utils = require(path.resolve(__dirname, "../utils"));
 
-const formatError = utils.formatError;
+var formatError = utils.formatError;
 
-let fn;
+function LocalTransportServerWrapper(o) {
+  function LocalTransportServer(fn) {
+    o.fn = fn;
+  }
 
-function LocalTransportServer(_fn) {
-    fn = _fn;
+  LocalTransportServer.prototype.listen = function (done) {
+    done();
+  };
+
+  LocalTransportServer.prototype.stop = function (done) {
+    done();
+  };
+
+  return LocalTransportServer;
 }
 
-LocalTransportServer.prototype.listen = function(done) {
-    done();
-};
+function LocalTransportClientWrapper(o) {
+  function LocalTransportClient() {}
 
-LocalTransportServer.prototype.stop = function(done) {
-    done();
-};
-
-function LocalTransportClient() {
-
-}
-
-LocalTransportClient.prototype.connect = function(done) {
+  LocalTransportClient.prototype.connect = function (done) {
     done(); //noop
-};
+  };
 
-LocalTransportClient.prototype.disconnect = function(done) {
+  LocalTransportClient.prototype.disconnect = function (done) {
     done(); //noop
-};
+  };
 
-LocalTransportClient.prototype.call = function(method, data, callback) {
+  LocalTransportClient.prototype.call = function (method, data, callback) {
     // force data to be passed through as valid json
     // both the input, and the response from the service
-    forceJSON(data, function(err, data) {
-        if(err) {
-            return callback(formatError(err));
-        }
-        fn(method, data, function(err, response) {
-            if(err) {
-                return forceJSON(formatError(err), function(err2, data) {
-                    if(err2) {
-                        return callback(formatError(err2));
-                    }
-                    return callback(formatError(data)); // data is still an error in this instance
-                });
-            }
-            forceJSON(response, callback);
-        });
-    });
-};
 
-function LocalTransport() {
-    this.Server = LocalTransportServer;
-    this.Client = LocalTransportClient;
+    data = forceJSON(data);
+
+    if (data && data.error) {
+      return callback(formatError(data));
+    }
+
+    o.fn(method, data, function (err, response) {
+      if (err) {
+        return callback(forceJSON(formatError(err)));
+      }
+
+      if(!response) {
+        return callback();
+      }
+
+      var responseErrKeyBefore = response.error;
+
+      response = forceJSON(response);
+
+      if(response.error && response.error != responseErrKeyBefore) {
+        // forceJSON error
+        return callback(formatError(response));
+      } else {
+        // response has an 'error' key, pass through normally
+        return callback(null, response);
+      }
+
+      return callback(null, response);
+
+    });
+  };
+
+  return LocalTransportClient;
 }
 
-export default LocalTransport;
+function LocalTransport() {
+  var o = {};
+  this.Server = LocalTransportServerWrapper(o);
+  this.Client = LocalTransportClientWrapper(o);
+}
 
-function forceJSON(input, callback) {
-    // JSON.stringify can throw on circular structures
-    try {
-        input = JSON.parse(JSON.stringify(input));
-    } catch(e) {
-        return callback(e);
-    }
-    return callback(null, input);
+module.exports = LocalTransport;
+
+function forceJSON(input) {
+  if (input === undefined) return;
+  // JSON.stringify can throw on circular structures
+  try {
+    input = JSON.parse(JSON.stringify(input));
+  } catch (e) {
+    return formatError(e);
+  }
+  return input;
 }

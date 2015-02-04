@@ -149,6 +149,24 @@ describe("Local Transport", function() {
 
     });
 
+    it("should return arguments in correct order even if normal response has an error key", function(done) {
+
+      let transport = new LOCAL();
+
+      let _server = new transport.Server(function(method, data, callback) {
+        callback(null, { error: 'a' });
+      });
+
+      let _client = new transport.Client();
+
+      _client.call("something", {}, function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, { error: 'a' });
+        done();
+      });
+
+    })
+
   });
 
 });

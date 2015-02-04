@@ -1,3 +1,7 @@
+Changelog 2.4.0:
+
+ * Fix error causing multiple local transports to fail if used in the same client
+
 Changelog 2.0.0:
 
  * Project converted to ES6.
