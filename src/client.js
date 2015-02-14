@@ -79,6 +79,17 @@ Client.prototype.call = function(service, method, data, callback) {
         return callback({ error: "unknown-service" });
     }
 
+    // this can be cleaned up
+    if(!data && !callback) {
+        data = undefined;
+        callback = function() {};
+    } else if(data && typeof data !== 'function' && !callback) {
+        callback = function() {};
+    } else if(typeof data === 'function') {
+        callback = data;
+        data = undefined;
+    }
+
     let _beforeMiddleware = self.middleware.before.filter((m) => {
         if(m.service && m.service !== service) return false;
         if(m.method  && m.method  !== method)  return false;

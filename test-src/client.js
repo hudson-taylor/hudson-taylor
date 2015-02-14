@@ -511,6 +511,63 @@ describe("Client", function() {
 
     });
 
+    it("should allow optional function", function(done) {
+
+        let services = {
+            "s1": mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, _data);
+                    callback();
+                    setTimeout(done, 100);
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.call("s1", "method", _data);
+
+    });
+
+    it("should allow optional data", function(done) {
+
+        let services = {
+            "s1": mockTransport({
+                call(method, data, callback) {
+                    assert.equal(data, null);
+                    callback(null, _data);
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.call("s1", "method", function(err, response) {
+            assert.ifError(err);
+            assert.deepEqual(response, _data);
+            done();
+        });
+
+    });
+
+    it("should allow optional data & callback", function(done) {
+
+        let services = {
+            "s1": mockTransport({
+                call(method, data, callback) {
+                    assert.equal(data, null);
+                    callback();
+                    setTimeout(done, 100);
+                }
+            })()
+        }
+
+        let client = new Client(services);
+
+        client.call("s1", "method");
+
+    });
+
 });
 
 function mockTransport(fns) {
