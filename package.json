@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Library for building services.",
   "main": "index.js",
   "directories": {
