@@ -568,6 +568,22 @@ describe("Client", function() {
 
     });
 
+    it("should support using 'remote' instead of 'call' for HT1.x compatibility", function(done) {
+
+        let services = {
+          s1: mockTransport()()
+        };
+
+        let client = new Client(services);
+
+        client.remote("s1", "method", _data, function(err, response) {
+          assert.ifError(err);
+          assert.deepEqual(response, _data);
+          done();
+        });
+
+    });
+
 });
 
 function mockTransport(fns) {

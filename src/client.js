@@ -137,6 +137,9 @@ Client.prototype.call = function(service, method, data, callback) {
 
 };
 
+// For backwards compatibility with HT1.x
+Client.prototype.remote = Client.prototype.call;
+
 Client.prototype.before = function(fn, opts = {}) {
     let { service, method } = opts;
     this.middleware.before.push({
