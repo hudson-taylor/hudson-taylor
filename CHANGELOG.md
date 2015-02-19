@@ -1,3 +1,7 @@
+Changelog 2.4.1:
+
+ * Add client 'remote' command to make it easier to migrate from HT1.x
+
 Changelog 2.4.0:
 
  * Fix error causing multiple local transports to fail if used in the same client
