@@ -81,6 +81,9 @@ function LocalTransport() {
 
 module.exports = LocalTransport;
 
+// export forceJSON too
+LocalTransport.forceJSON = forceJSON;
+
 function forceJSON(input) {
   if (input === undefined) return;
   // JSON.stringify can throw on circular structures

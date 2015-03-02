@@ -165,7 +165,16 @@ describe("Local Transport", function() {
         done();
       });
 
-    })
+    });
+
+  });
+
+  describe("forceJSON", function() {
+
+    it("should return undefined if no input", function() {
+      var result = LOCAL.forceJSON();
+      assert.equal(result, undefined);
+    });
 
   });
 

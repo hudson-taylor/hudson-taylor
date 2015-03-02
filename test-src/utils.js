@@ -43,40 +43,106 @@ describe("Utilities", function() {
 
         });
 
-        it("should gather payload properly", function(done) {
+        describe("it should gather payload properly", function() {
 
-            let req = {
-                body: {
-                    a: 5
-                },
-                params: {
-                    a: 10,
-                    b: 15
-                },
-                query: {
-                    a: 20,
-                    b: 25,
-                    c: 30
-                }
-            };
+          it("body", function(done) {
 
-            let merged = {
-                a: 5,
-                b: 15,
-                c: 30
-            };
+            var req = {
+              body: {
+                a: 5
+              }
+            }
 
             let client = {
-                call(service, method, data, callback) {
-                    assert.deepEqual(data, merged);
-                    done();
-                }
-            }
+              call(service, method, data, callback) {
+                assert.deepEqual(data, {
+                  a: 5
+                });
+                done();
+              }
+            };
 
             utils.expressProxy(client, "", "")(req);
 
-        });
+          });
 
+          it("params", function(done) {
+
+            var req = {
+              params: {
+                b: 10
+              }
+            }
+
+            let client = {
+              call(service, method, data, callback) {
+                assert.deepEqual(data, {
+                  b: 10
+                });
+                done();
+              }
+            };
+
+            utils.expressProxy(client, "", "")(req);
+
+          });
+
+          it("query", function(done) {
+
+            var req = {
+              query: {
+                c: 15
+              }
+            }
+
+            let client = {
+              call(service, method, data, callback) {
+                assert.deepEqual(data, {
+                  c: 15
+                });
+                done();
+              }
+            };
+
+            utils.expressProxy(client, "", "")(req);
+
+          });
+
+          it("should merge properly", function(done) {
+
+              let req = {
+                  body: {
+                      a: 5
+                  },
+                  params: {
+                      a: 10,
+                      b: 15
+                  },
+                  query: {
+                      a: 20,
+                      b: 25,
+                      c: 30
+                  }
+              };
+
+              let merged = {
+                  a: 5,
+                  b: 15,
+                  c: 30
+              };
+
+              let client = {
+                  call(service, method, data, callback) {
+                      assert.deepEqual(data, merged);
+                      done();
+                  }
+              }
+
+              utils.expressProxy(client, "", "")(req);
+
+          });
+
+        });
 
         it("should add middleware properly", function() {
 
@@ -115,6 +181,26 @@ describe("Utilities", function() {
                 assert.deepEqual(res.body, { body: data });
 
                 done();
+
+            });
+
+        });
+
+        it("should return 500 if service returns error", function(done) {
+
+            let data = { hello: "world" };
+
+            request.post('/error')
+            .send(data)
+            .end(function(err, res) {
+              assert.ifError(err);
+
+              assert.equal(res.statusCode, 500);
+              assert.deepEqual(res.body, {
+                error: "oops"
+              });
+
+              done();
 
             });
 
