@@ -1,6 +1,24 @@
 Changelog 2.4.1:
 
  * Add client 'remote' command to make it easier to migrate from HT1.x
+ * Allow optional data to be passed into a service call.
+ * Allow optional function to be passed into a service call.
+
+Changelog 2.4.0:
+
+ * Fix regression where multiple local transports stopped working under certain conditions. 
+
+Changelog 2.3.0:
+
+ * Fix error reponses where response is not javascript primitive type. 
+
+Changelog 2.2.0:
+
+ * No changes, mispublish.
+
+Changelog 2.1.0:
+
+ * Add middleware for intercepting requests and responses.
 
 Changelog 2.4.0:
 

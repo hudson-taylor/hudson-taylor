@@ -5,7 +5,7 @@ hudson-taylor
 [![Coverage Status](https://img.shields.io/coveralls/hudson-taylor/hudson-taylor/master.svg)](https://coveralls.io/r/hudson-taylor/hudson-taylor?branch=master)
 
 Hudson Taylor (ht) is a client/server library for building automatically
-documented, well validated services (SOA) in Node.js
+documented**\***, well validated services (SOA) in Node.js
 
 HT comprises of a server library for providing services with well documented
 and defined APIs with validation, and client libraries for calling
@@ -20,6 +20,8 @@ can be used within a single process to logically partition services. This means
 that your project has clean internal interfaces from the outset, and when it
 comes time to scale out you can break-out services and replicate them
 horizontally.
+
+**\*** Automatic documentation is still being worked on.
 
 Current Version: 2.4.1
 
