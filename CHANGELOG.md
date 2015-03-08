@@ -1,3 +1,7 @@
+Changelog 2.4.2:
+
+ * Switch to BabelJS from 6to5
+
 Changelog 2.4.1:
 
  * Add client 'remote' command to make it easier to migrate from HT1.x
@@ -6,11 +10,11 @@ Changelog 2.4.1:
 
 Changelog 2.4.0:
 
- * Fix regression where multiple local transports stopped working under certain conditions. 
+ * Fix regression where multiple local transports stopped working under certain conditions.
 
 Changelog 2.3.0:
 
- * Fix error reponses where response is not javascript primitive type. 
+ * Fix error reponses where response is not javascript primitive type.
 
 Changelog 2.2.0:
 
@@ -70,7 +74,7 @@ Changelog 0.0.5:
 
 Changelog 0.0.3:
 
- * Added ht.utils.expressProxy for mapping services to express routes. 
+ * Added ht.utils.expressProxy for mapping services to express routes.
 
 Changelog: 0.0.2:
 
