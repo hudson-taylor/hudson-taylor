@@ -1,3 +1,11 @@
+Changelog 2.4.4:
+
+ * Update bundled ht-schema version.
+
+Changelog 2.4.3:
+
+ * Client: Deprecate 'remote' function in favour of 'call'
+
 Changelog 2.4.2:
 
  * Switch to BabelJS from 6to5
