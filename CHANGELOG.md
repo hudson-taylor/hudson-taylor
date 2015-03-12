@@ -1,3 +1,7 @@
+Changelog 2.4.5:
+
+ * See 2.4.4
+
 Changelog 2.4.4:
 
  * Update bundled ht-schema version.

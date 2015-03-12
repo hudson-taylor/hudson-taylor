@@ -33,7 +33,7 @@ let Service = function Service(Transports, config) {
 
         if(_tmp.schema) {
             try {
-                if(!_tmp.schema.hasOwnProperty('childValidators')) {
+                if(!_tmp.schema.hasOwnProperty('$validators')) {
                     data = s.Object(_tmp.schema).validate(data);
                 } else {
                     data = _tmp.schema.validate(data);
