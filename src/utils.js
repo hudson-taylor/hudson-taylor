@@ -59,10 +59,10 @@ var formatError = function formatError(err) {
         err = err.message || err.toString();
     }
     return { error: err };
-}
+};
 
 export {
     expressProxy,
     merge,
     formatError
-}
+};

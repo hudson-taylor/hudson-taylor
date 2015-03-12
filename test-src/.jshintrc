@@ -5,5 +5,7 @@
         "xit":      true,
         "before":   true,
         "after":    true
-    }
+    },
+    "node":   true,
+    "esnext": true
 }

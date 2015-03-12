@@ -88,8 +88,8 @@ describe("Service", function() {
     assert.equal(typeof service.on, "function");
 
     assert.doesNotThrow(function() {
-      service.on("something", s.Object({ strict: false }), (req, done) => { done() });
-      service.on("somethingelse", (req, done) => { done() });
+      service.on("something", s.Object({ strict: false }), (req, done) => { done(); });
+      service.on("somethingelse", (req, done) => { done(); });
     });
 
   });

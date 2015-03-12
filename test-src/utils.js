@@ -51,7 +51,7 @@ describe("Utilities", function() {
               body: {
                 a: 5
               }
-            }
+            };
 
             let client = {
               call(service, method, data, callback) {
@@ -72,7 +72,7 @@ describe("Utilities", function() {
               params: {
                 b: 10
               }
-            }
+            };
 
             let client = {
               call(service, method, data, callback) {
@@ -93,7 +93,7 @@ describe("Utilities", function() {
               query: {
                 c: 15
               }
-            }
+            };
 
             let client = {
               call(service, method, data, callback) {
@@ -136,7 +136,7 @@ describe("Utilities", function() {
                       assert.deepEqual(data, merged);
                       done();
                   }
-              }
+              };
 
               utils.expressProxy(client, "", "")(req);
 

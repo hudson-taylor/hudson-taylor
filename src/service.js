@@ -89,7 +89,7 @@ let Service = function Service(Transports, config) {
                     cb(null, response);
                 });
 
-            }
+            };
 
             // Call the function, injecting extra args from config
             let _s = _tmp.fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
@@ -118,7 +118,7 @@ Service.prototype.addTransport = function(transport, done = () => {}) {
     } else {
         done();
     }
-}
+};
 
 Service.prototype.on = function(method, schema, fn) {
 
@@ -140,7 +140,7 @@ Service.prototype.before = function(fn, opts = {}) {
         method,
         fn
     });
-}
+};
 
 Service.prototype.after = function(fn, opts = {}) {
     let { method } = opts;
@@ -148,7 +148,7 @@ Service.prototype.after = function(fn, opts = {}) {
         method,
         fn
     });
-}
+};
 
 Service.prototype.listen = function(done = () => {}) {
     let self = this;
@@ -180,6 +180,6 @@ Service.prototype.stop = function(done = () => {}) {
 
 Service.prototype.call = function(method, data, cb) {
     this.fn(method, data, cb);
-}
+};
 
 export default Service;

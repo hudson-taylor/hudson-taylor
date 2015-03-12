@@ -147,7 +147,8 @@ Client.prototype.before = function(fn, opts = {}) {
         method,
         fn
     });
-}
+};
+
 Client.prototype.after = function(fn, opts = {}) {
     let { service, method } = opts;
     this.middleware.after.push({
@@ -155,6 +156,6 @@ Client.prototype.after = function(fn, opts = {}) {
         method,
         fn
     });
-}
+};
 
 export default Client;

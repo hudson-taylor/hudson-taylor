@@ -28,7 +28,7 @@ describe("Client", function() {
         let services = {
             hello: { Client() { called++; } },
             world: { Client() { called++; } }
-        }
+        };
 
         let client = new Client(services);
 
@@ -56,7 +56,7 @@ describe("Client", function() {
         let services = {
             "test1": mockTransport()({}),
             "test2": mockTransport()({})
-        }
+        };
         let client = new Client(services);
         let connected = { test1: false, test2: false };
         client.on("connected", function(name) {
@@ -112,7 +112,7 @@ describe("Client", function() {
         let services = {
             "test1": mockTransport()({}),
             "test2": mockTransport()({})
-        }
+        };
         let client = new Client(services);
         let called = { method1: false, method2: false };
         client.on("called", function(service, method) {
@@ -135,7 +135,7 @@ describe("Client", function() {
         let services = {
             "test1": mockTransport()({}),
             "test2": mockTransport()({})
-        }
+        };
         let client = new Client(services);
         assert.throws(function() {
             client.add(firstKey(services), mockTransport());
@@ -146,7 +146,7 @@ describe("Client", function() {
         let services = {
             "test1": mockTransport()({}),
             "test2": mockTransport()({})
-        }
+        };
         let client = new Client(services);
         let countBefore = Object.keys(client.connections).length;
         client.add("test3", mockTransport()({}));
@@ -157,13 +157,13 @@ describe("Client", function() {
 
         let called = 0;
 
-        let fn = { Client() { return { connect(done) { called++; done() } } } };
+        let fn = { Client() { return { connect(done) { called++; done(); } }; } };
 
         let services = {
             test1: fn,
             test2: fn,
             test3: fn
-        }
+        };
 
         let client = new Client(services);
 
@@ -179,7 +179,7 @@ describe("Client", function() {
 
         let services = {
             test1: mockTransport()()
-        }
+        };
 
         let client = new Client(services);
 
@@ -199,7 +199,7 @@ describe("Client", function() {
                     return callback(_err);
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
@@ -229,7 +229,7 @@ describe("Client", function() {
                     done();
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
@@ -241,7 +241,7 @@ describe("Client", function() {
         client.before(function(data, callback) {
             assert.deepEqual(data, _data2);
             return callback(null, _data3);
-        })
+        });
 
         client.call("test1", "", _data, function(err) {
             assert.ifError(err);
@@ -289,7 +289,7 @@ describe("Client", function() {
                     return callback(null, _data2);
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
@@ -423,7 +423,7 @@ describe("Client", function() {
 
         let services = {
             test1: mockTransport()()
-        }
+        };
 
         let client = new Client(services);
 
@@ -446,7 +446,7 @@ describe("Client", function() {
 
         let services = {
             test1: mockTransport()()
-        }
+        };
 
         let client = new Client(services);
 
@@ -469,13 +469,13 @@ describe("Client", function() {
 
         let called = 0;
 
-        let fn = { Client() { return { disconnect(done) { called++; done() } } } };
+        let fn = { Client() { return { disconnect(done) { called++; done(); } }; } };
 
         let services = {
             test1: fn,
             test2: fn,
             test3: fn
-        }
+        };
 
         let client = new Client(services);
 
@@ -521,7 +521,7 @@ describe("Client", function() {
                     setTimeout(done, 100);
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
@@ -538,7 +538,7 @@ describe("Client", function() {
                     callback(null, _data);
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
@@ -560,7 +560,7 @@ describe("Client", function() {
                     setTimeout(done, 100);
                 }
             })()
-        }
+        };
 
         let client = new Client(services);
 
