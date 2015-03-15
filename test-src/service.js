@@ -240,26 +240,6 @@ describe("Service", function() {
 
   });
 
-  it("should inject dependencies into method handlers", function(done) {
-
-    let config = {
-      a: 5
-    };
-
-    let transport = mockTransport();
-
-    let service = new Service(transport(), config);
-
-    service.on("echo", function(request, callback, something, a) {
-      assert.equal(something, undefined);
-      assert.equal(a, config.a);
-      done();
-    });
-
-    service.call("echo", {});
-
-  });
-
   it("should allow adding middleware", function() {
 
     let service = new Service(mockTransport()());

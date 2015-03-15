@@ -91,14 +91,7 @@ let Service = function Service(Transports, config) {
 
             };
 
-            // Call the function, injecting extra args from config
-            let _s = _tmp.fn.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
-            /* istanbul ignore next */
-            let args = _s.slice(_s.indexOf('(') + 1, _s.indexOf(')')).match(/([^\s,]+)/g) || [];
-
-            _tmp.fn.apply(_tmp, [data, finish].concat(args.slice(2).map(function(a) {
-                return config[a];
-            })));
+            _tmp.fn(data, finish);
 
         });
 

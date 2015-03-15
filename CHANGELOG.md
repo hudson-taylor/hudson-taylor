@@ -1,3 +1,7 @@
+Changelog 3.0.0:
+
+ * Remove automatic dependency injection. Export a function that takes all of your required arguments instead.
+
 Changelog 2.4.5:
 
  * See 2.4.4

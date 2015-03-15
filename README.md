@@ -14,7 +14,6 @@ services over a number of transports, HTTP, Websocket, TCP or in-process.
 All service APIs have a schema that both document expectations as well as
 validates and pre-processes incoming data.
 
-
 As well as providing for seperate processes communicating with eachother, HT
 can be used within a single process to logically partition services. This means
 that your project has clean internal interfaces from the outset, and when it
@@ -23,7 +22,9 @@ horizontally.
 
 **\*** Automatic documentation is still being worked on.
 
-Current Version: 2.4.1
+*Note:* If you see **HT2** anywhere, this references the new rewrite, and is applicable to any version >=2.x.x
+
+Current Version: 3.0.0
 
 See [Changelog here](CHANGELOG.md)
 
