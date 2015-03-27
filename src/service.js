@@ -29,7 +29,7 @@ let Service = function Service(Transports, config) {
 
     this.fn = function(method, data, cb) {
         let _tmp = self._methods[method];
-        if(!_tmp) return cb({ error: "unknown-method" });
+        if(!_tmp) return cb({ error: "unknown-method", method: method });
 
         if(_tmp.schema) {
             try {

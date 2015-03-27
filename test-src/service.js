@@ -210,9 +210,12 @@ describe("Service", function() {
 
     let service = new Service(transport());
 
-    service.call("unknown", {}, function(err) {
+    let _method = "unknown";
+
+    service.call(_method, {}, function(err) {
 
       assert.equal(err.error, "unknown-method");
+      assert.equal(err.method, _method);
 
       done();
 

@@ -1,3 +1,7 @@
+Changelog 3.1.0:
+
+ * Return method along with error if unknown-method
+
 Changelog 3.0.0:
 
  * Remove automatic dependency injection. Export a function that takes all of your required arguments instead.
