@@ -584,6 +584,33 @@ describe("Client", function() {
 
     });
 
+    it("should be able to prepare a query and execute it after", function(done) {
+
+        let services = {
+            s1: mockTransport({
+                call(method, data, callback) {
+                    assert.deepEqual(data, _data);
+                    callback(null, _data2);
+                }
+            })()
+        };
+
+        let client = new Client(services);
+
+        let prepared = client.prepare("s1", "method", _data);
+
+        prepared(function(err, data) {
+            assert.ifError(err);
+            assert.deepEqual(data, _data2);
+            prepared(function(err, data2) {
+                assert.ifError(err);
+                assert.deepEqual(data2, _data2);
+                done();
+            });
+        });
+
+    });
+
 });
 
 function mockTransport(fns) {

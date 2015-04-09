@@ -158,4 +158,10 @@ Client.prototype.after = function(fn, opts = {}) {
     });
 };
 
+Client.prototype.prepare = function(service, method, data) {
+    return (callback) => {
+        this.call(service, method, data, callback);
+    }
+}
+
 export default Client;
