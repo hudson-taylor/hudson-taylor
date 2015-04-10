@@ -1,6 +1,8 @@
 
 "use strict";
 
+const async = require("async");
+
 var expressProxy = function(remote, serviceName, signal) {
 
     /* expressProxy returns an express route handler for that combines:
@@ -61,8 +63,60 @@ var formatError = function formatError(err) {
     return { error: err };
 };
 
+var getLastResult = function getLastResult(methods, callback, isService) {
+
+    async.reduce(methods, undefined, (lastResult, stored, done) => {
+
+        let {
+            service,
+            method,
+            data = lastResult
+        } = stored;
+
+        let call = [
+            service,
+            method,
+            data, 
+            function(err, result) {
+                if(err) {
+                    let r = {
+                        error: err,
+                        method
+                    }
+                    if(!isService) {
+                        r.service = service;
+                    }
+                    return done(r);
+                }
+
+                if(!isService) {
+
+                    var index = methods.indexOf(stored);
+                    var next = methods[index + 1];
+
+                    if(next && next.data && !next.data[0].data) {
+                        methods[index + 1].data[0].data = result;
+                    }
+
+                }
+
+                return done(null, result);
+
+            }
+        ];
+
+        if(isService) {
+            call.shift();
+        }
+
+        this.call(...call);
+
+    }, callback);
+}
+
 export {
     expressProxy,
     merge,
-    formatError
+    formatError,
+    getLastResult
 };

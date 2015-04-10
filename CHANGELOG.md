@@ -1,3 +1,15 @@
+Changelog 4.0.0:
+
+ * Change Client.prototype.chain to execute sequential service calls on the remote host.
+
+Changelog 3.3.0:
+
+ * Add Client.prototype.chain for method chaining
+
+Changelog 3.2.0:
+
+ * Add Client.prototype.prepare
+
 Changelog 3.1.0:
 
  * Return method along with error if unknown-method
