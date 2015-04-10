@@ -17,6 +17,10 @@ const _data3 = {
     even: "more"
 };
 
+const _data4 = {
+    more: "data"
+};
+
 const _err = new Error("oopsies!");
 
 describe("Client", function() {
@@ -611,7 +615,7 @@ describe("Client", function() {
         });
 
     });
-    
+
     describe("prepare", function() {
 
         it("should be able to prepare a query and execute it after", function(done) {
@@ -638,6 +642,137 @@ describe("Client", function() {
                     done();
                 });
             });
+
+        });
+
+    });
+
+    describe("chain", function() {
+
+        it("should be able to chain calls", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        switch(method) {
+                            case "method1": {
+                                assert.deepEqual(data, _data)
+                                return callback(null, _data2);
+                            }
+                            case "method2": {
+                                assert.deepEqual(data, _data2);
+                                return callback(null, _data3);
+                            }
+                            case "method3": {
+                                assert.deepEqual(data, _data3);
+                                return callback(null, _data4);
+                            }
+                        }
+                    }
+                })()
+            };
+
+            let client = new Client(services);
+
+            client.chain("s1", "method1", _data)
+                .chain("s1", "method2")
+                .chain("s1", "method3")
+                .end(function(err, result) {
+                    assert.ifError(err);
+                    assert.deepEqual(result, _data4);
+                    done();
+                });
+
+        });
+
+        it("should be able to override data for certain calls", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        switch(method) {
+                            case "method1": {
+                                assert.deepEqual(data, _data)
+                                return callback(null, _data2);
+                            }
+                            case "method2": {
+                                // method2 should have overriden data
+                                assert.deepEqual(data, _data4);
+                                return callback(null, _data3);
+                            }
+                        }
+                    }
+                })()
+            };
+
+            let client = new Client(services);
+
+            client.chain("s1", "method1", _data)
+                .chain("s1", "method2", _data4)
+                .end(function(err, result) {
+                    assert.ifError(err);
+                    assert.deepEqual(result, _data3)
+                    done();
+                });
+
+        });
+
+        it("should be stop chain if call returns error", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        switch(method) {
+                            case "method1": {
+                                assert.deepEqual(data, _data)
+                                return callback(null, _data2);
+                            }
+                            case "method2": {
+                                assert.deepEqual(data, _data2);
+                                return callback(_err);
+                            }
+                            case "method3": {
+                                assert.deepEqual(data, _data3);
+                                return callback(null, _data4);
+                            }
+                        }
+                    }
+                })()
+            };
+
+            let client = new Client(services);
+
+            client.chain("s1", "method1", _data)
+                .chain("s1", "method2")
+                .chain("s1", "method3")
+                .end(function(err, result) {
+                    assert.deepEqual(err, {
+                        service: "s1",
+                        method: "method2",
+                        error: _err
+                    });
+                    assert.equal(result, undefined);
+                    done();
+                });
+
+        });
+
+        it("should be return immediately if service or method doesn't exist", function(done) {
+
+            let client = new Client({});
+
+            client.chain("s1", "method")
+                .end(function(err, result) {
+                    assert.deepEqual(err, {
+                        service: "s1",
+                        method: "method",
+                        error: {
+                            error: "unknown-service"
+                        }
+                    });
+                    assert.equal(result, undefined);
+                    done();
+                });
 
         });
 

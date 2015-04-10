@@ -164,4 +164,53 @@ Client.prototype.prepare = function(service, method, data) {
     }
 }
 
+Client.prototype.chain = function(...args) {
+
+    var client = this;
+
+    if(!client.isChain) {
+        // return new instance of the client
+        // so we can set values on it
+        client = new Client();
+        for(var k in this) {
+            if(client.hasOwnProperty(k)) {
+                client[k] = this[k];
+            }
+        }
+        client.isChain = true;
+        client.chainedMethods = [];
+    }
+
+    client.chainedMethods.push(args)
+
+    return client;
+
+}
+
+Client.prototype.end = function(callback) {
+
+    async.reduce(this.chainedMethods, undefined, (lastResult, stored, done) => {
+
+        let service = stored[0];
+        let method  = stored[1];
+        let data    = stored[2] !== undefined ? stored[2] : lastResult;
+
+        this.call(service, method, data, function(err, data) {
+
+            if(err) {
+                return done({
+                    error:   err,
+                    service: service,
+                    method:  method
+                });
+            }
+
+            return done(null, data);
+
+        });
+
+    }, callback);
+
+}
+
 export default Client;
