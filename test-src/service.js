@@ -18,6 +18,10 @@ const _data3 = {
   even: "more"
 };
 
+const _data4 = {
+  more: "data"
+};
+
 const _err = new Error("oopsies!");
 
 describe("Service", function() {
@@ -229,7 +233,9 @@ describe("Service", function() {
 
     let service = new Service(transport());
 
-    service.on("double", { number: s.Number() }, function(request, callback) {
+    service.on("double", {
+      number: s.Number()
+    }, function(request, callback) {
       return callback(null, request.number * 2);
     });
 
@@ -514,6 +520,58 @@ describe("Service", function() {
         assert.equal(err, _err);
         done();
       });
+    });
+
+  });
+
+  it("$htMultiCall should return last result when called with multiple calls", function(done) {
+
+    let service = new Service();
+
+    service.on("method1", s.Object({ opt: true, strict: false }), function(data, callback) {
+      assert.deepEqual(data, _data);
+      return callback(null, _data2);
+    });
+
+    service.on("method2", s.Object({ opt: true, strict: false }), function(data, callback) {
+      assert.deepEqual(data, _data2);
+      return callback(null, _data3);
+    });
+
+    service.on("method3", s.Object({ opt: true, strict: false }), function(data, callback) {
+      assert.deepEqual(data, _data3);
+      return callback(null, _data4);
+    });
+
+    service.call("$htMultiCall", [
+      { method: "method1", data: _data },
+      { method: "method2" },
+      { method: "method3" }
+    ], function(err, response) {
+
+      assert.ifError(err);
+      assert.deepEqual(response, _data4);
+      done();
+
+    });
+
+  });
+
+  it("$htMultiCall should return with unknown-method if called with an unknown method", function(done) {
+
+    let service = new Service();
+
+    service.call("$htMultiCall", [
+      { method: "unknown" }
+    ], function(err) {
+      assert.deepEqual(err, {
+        error: {
+          error:  "unknown-method",
+          method: "unknown"
+        },
+        method: "unknown"
+      });
+      done();
     });
 
   });

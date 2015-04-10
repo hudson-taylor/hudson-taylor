@@ -4,6 +4,8 @@
 const async   = require("async");
 const s       = require("ht-schema");
 
+const utils = require("./utils");
+
 let Service = function Service(Transports, config) {
     let self = this;
 
@@ -96,6 +98,15 @@ let Service = function Service(Transports, config) {
         });
 
     };
+
+    this.on("$htMultiCall", s.Array({ opt: false }, [
+        s.Object({
+            method:  s.String(),
+            data:    s.Any({ opt: true })
+        })
+    ]), function(data, callback) {
+        utils.getLastResult.bind(self)(data, callback, true);
+    });
 
     Transports.forEach(function(transport) {
         self.addTransport(transport);

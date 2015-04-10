@@ -5,6 +5,8 @@ const util   = require("util");
 const events = require("events");
 const async  = require("async");
 
+const utils = require("./utils");
+
 let Client = function Client(services) {
 
     this.services    = {};
@@ -164,7 +166,7 @@ Client.prototype.prepare = function(service, method, data) {
     }
 }
 
-Client.prototype.chain = function(...args) {
+Client.prototype.chain = function(service, method, data) {
 
     var client = this;
 
@@ -181,7 +183,11 @@ Client.prototype.chain = function(...args) {
         client.chainedMethods = [];
     }
 
-    client.chainedMethods.push(args)
+    client.chainedMethods.push({
+        service,
+        method,
+        data
+    });
 
     return client;
 
@@ -189,27 +195,44 @@ Client.prototype.chain = function(...args) {
 
 Client.prototype.end = function(callback) {
 
-    async.reduce(this.chainedMethods, undefined, (lastResult, stored, done) => {
+    let tmp = this.chainedMethods.reduce(function(previous, method) {
 
-        let service = stored[0];
-        let method  = stored[1];
-        let data    = stored[2] !== undefined ? stored[2] : lastResult;
+        let last = previous[previous.length - 1];
 
-        this.call(service, method, data, function(err, data) {
+        if(!last || last.service != method.service) {
+            previous.push({
+                service: method.service,
+                calls:   []
+            });
+        }
 
-            if(err) {
-                return done({
-                    error:   err,
-                    service: service,
-                    method:  method
-                });
-            }
+        let call = {
+            method: method.method
+        }
 
-            return done(null, data);
+        if(method.data) {
+            call.data = method.data;
+        }
 
-        });
+        previous[previous.length-1].calls.push(call);
 
-    }, callback);
+        return previous;
+
+    }, []);
+
+    let methods = tmp.map(function(serviceCall) {
+
+        let call = {
+            service: serviceCall.service,
+            method: "$htMultiCall",
+            data:   serviceCall.calls
+        }
+
+        return call;
+
+    });
+
+    utils.getLastResult.bind(this)(methods, callback);
 
 }
 
