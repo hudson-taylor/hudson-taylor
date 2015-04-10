@@ -168,13 +168,13 @@ Client.prototype.prepare = function(service, method, data) {
 
 Client.prototype.chain = function(service, method, data) {
 
-    var client = this;
+    let client = this;
 
     if(!client.isChain) {
         // return new instance of the client
         // so we can set values on it
         client = new Client();
-        for(var k in this) {
+        for(let k in this) {
             if(client.hasOwnProperty(k)) {
                 client[k] = this[k];
             }

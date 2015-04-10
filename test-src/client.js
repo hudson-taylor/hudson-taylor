@@ -724,6 +724,37 @@ describe("Client", function() {
 
         });
 
+        it("should successfully be able to call methods on multiple services", function(done) {
+
+            let str    = "hello world";
+            let strRev = "dlrow olleh";
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        assert.equal(data[0].data, str);
+                        return callback(null, data[0].data);
+                    }
+                })(),
+                s2: mockTransport({
+                    call(method, data, callback) {
+                        // reverse
+                        assert.equal(data[0].data, str);
+                        return callback(null, data[0].data.split("").reverse().join(""));
+                    }
+                })()
+            };
+
+            let client = new Client(services);
+
+            client.chain("s1", "echo", str).chain("s2", "reverse").end(function(err, response) {
+                assert.ifError(err);
+                assert.deepEqual(response, strRev);
+                done();
+            });
+
+        });
+
         it("should be return immediately if service or method doesn't exist", function(done) {
 
             let client = new Client({});
