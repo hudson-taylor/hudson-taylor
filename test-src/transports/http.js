@@ -3,6 +3,7 @@
 
 const assert = require("assert");
 const net    = require("net");
+const https  = require("https");
 
 const openport   = require("openport");
 const request    = require("request");
@@ -10,6 +11,8 @@ const express    = require("express");
 const bodyParser = require("body-parser");
 
 const HTTP = require("../../lib/transports/http");
+
+const SSLKeys = require("../fixtures/sslkeys");
 
 describe("HTTP Transport", function() {
 
@@ -32,6 +35,48 @@ describe("HTTP Transport", function() {
 			transport = new HTTP({ port, host });
 
 			assert.equal(transport instanceof HTTP, true);
+
+		});
+
+		it("should throw if required arguments are not passed in", function() {
+
+			assert.throws(function() {
+				let transport = new HTTP();
+			});
+
+			assert.throws(function() {
+				let transport = new HTTP({
+					host: "0.0.0.0"
+				});
+			});
+
+			assert.throws(function() {
+				let transport = new HTTP({
+					port: 80
+				});
+			});
+
+		});
+
+		it("should set defaults correctly", function() {
+
+			let transport = new HTTP({
+				port,
+				host
+			});
+
+			assert.equal(transport.config.ssl, false);
+			assert.equal(transport.config.path, "/ht");
+
+			transport = new HTTP({
+				port,
+				host,
+				ssl: true,
+				path: "/other"
+			});
+
+			assert.equal(transport.config.ssl, true);
+			assert.equal(transport.config.path, "/other");
 
 		});
 
@@ -148,6 +193,56 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should enable HTTPS if SSL options are specified", function(done) {
+
+			let _method = "something";
+			let _data = { hello: "world" };
+
+			let { cert, key, ca } = SSLKeys;
+
+			let transport =	 new HTTP({
+				port,
+				host,
+				ssl: {
+					cert,
+					key,
+					ca:                 [ ca ],
+					agent: 							false,
+					rejectUnauthorized: false
+				}
+			});
+
+			let server = new transport.Server(function(method, data, callback) {
+				return callback(null, data);
+			});
+
+			assert.equal(server.config.ssl.cert, SSLKeys.cert);
+
+			server.listen(function(err) {
+				assert.ifError(err);
+
+				// This needs to be set or else http.request will
+				// throw an error because we're using self signed
+				// certificates..
+				process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+				request({
+					url:    "https://" + host + ":" + port + "/ht",
+					method: "POST",
+					json:   { method: _method, args: _data }
+				}, function(e, r, body) {
+					assert.ifError(e);
+
+					assert.equal(body.hello, _data.hello);
+
+					server.stop(done);
+
+				});
+
+			});
+
+		});
+
 	});
 
 	describe("Client", function() {
@@ -210,33 +305,57 @@ describe("HTTP Transport", function() {
 
 		});
 
-		it("should generate correct url when custom endpoint is set", function() {
+		it("should enable HTTPS if SSL options are specified", function(done) {
 
-			let _path = "/custom";
+			let _method = "hello";
+			let _data   = { something: "world" };
+
+			let app = express();
+			app.use(bodyParser.json());
+			app.post("/ht", function(req, res) {
+				let { method, args } = req.body;
+				assert.equal(req.secure, true);
+				assert.equal(method, _method);
+				assert.deepEqual(args, _data);
+				res.json(_data);
+			});
 
 			let transport = new HTTP({
-				port,
 				host,
-				path: "/custom"
+				port,
+				ssl: true
 			});
 
 			let client = new transport.Client();
 
-			assert.equal(client.url, "http://" + host + ":" + port + _path);
+			let _app = https.createServer(SSLKeys, app);
+
+			_app.listen(port, host, function() {
+				client.call(_method, _data, function(err, response) {
+					assert.ifError(err);
+					assert.deepEqual(response, _data);
+					_app.close(done);
+				});
+			});
 
 		});
 
-		it("should generate correct url when SSL is enabled", function() {
+		it("should return error if response is not valid JSON", function(done) {
 
-			let transport = new HTTP({
-				port,
-				host,
-				ssl: true 
+			let app = express();
+			app.use(bodyParser.json());
+			app.post("/ht", function(req, res) {
+				res.end('hello');
 			});
 
 			let client = new transport.Client();
 
-			assert.equal(client.url, "https://" + host + ":" + port + "/ht");
+			let _server = app.listen(port, host, function() {
+				client.call('a', 'b', function(err) {
+					assert.equal(err.toString(), "SyntaxError: Unexpected token h");
+					_server.close(done);
+				});
+			});
 
 		});
 
