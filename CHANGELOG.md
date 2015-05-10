@@ -1,3 +1,7 @@
+Changelog 5.0.0:
+
+ * Overhaul HTTP Transport to ensure SSL works.
+
 Changelog 4.0.0:
 
  * Change Client.prototype.chain to execute sequential service calls on the remote host.
