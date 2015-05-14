@@ -192,11 +192,10 @@ describe("Utilities", function() {
 
             request.post('/error')
             .send(data)
-            .end(function(err, res) {
-              assert.ifError(err);
+            .end(function(err) {
 
-              assert.equal(res.statusCode, 500);
-              assert.deepEqual(res.body, {
+              assert.equal(err.status, 500);
+              assert.deepEqual(err.response.body, {
                 error: "oops"
               });
 
