@@ -544,6 +544,71 @@ describe("Client", function() {
 
         });
 
+        it("should expose service and method to middleware", function(done) {
+
+            let _service = "test1";
+            let _method  = "hello";
+            let _data    = "world";
+
+            let services = {
+                test1: mockTransport()()
+            };
+
+            let client = new Client(services);
+
+            client.before(function(data, callback) {
+                assert.equal(this.service, _service);
+                assert.equal(this.method, _method);
+                return callback(null, data);
+            });
+
+            client.after(function(data, callback) {
+                assert.equal(this.service, _service);
+                assert.equal(this.method, _method);
+                return callback(null, data);
+            });
+
+            client.call(_service, _method, _data, function(err) {
+                assert.ifError(err);
+                return done();
+            });
+
+        });
+
+        it("should be able to change service & method in before middleware", function(done) {
+
+            let _beforeService = "service1";
+            let _beforeMethod  = "method1";
+
+            let _afterService = "service2";
+            let _afterMethod  = "method2";
+
+            let services = {
+                service2: mockTransport({
+                    call(method, data, callback) {
+                        assert.equal(method, _afterMethod);
+                        return callback(null, data);
+                    }
+                })()
+            };
+
+            let client = new Client(services);
+
+            client.before(function(data, callback) {
+                assert.equal(this.service, _beforeService);
+                assert.equal(this.method, _beforeMethod);
+                this.service = _afterService;
+                this.method = _afterMethod;
+                return callback(null, data);
+            });
+
+            client.call(_beforeService, _beforeMethod, "", function(err) {
+                assert.ifError(err);
+                done();
+            });
+
+        });
+
     });
 
     describe("disconnect", function() {

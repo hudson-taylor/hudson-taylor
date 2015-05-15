@@ -75,11 +75,10 @@ Client.prototype.disconnect = function(done) {
 Client.prototype.call = function(service, method, data, callback) {
     let self = this;
 
-    let conn = this.connections[service];
-
-    if(!conn) {
-        return callback({ error: "unknown-service" });
-    }
+    let context = {
+        service,
+        method
+    };
 
     // this can be cleaned up
     if(!data && !callback) {
@@ -93,13 +92,13 @@ Client.prototype.call = function(service, method, data, callback) {
     }
 
     let _beforeMiddleware = self.middleware.before.filter((m) => {
-        if(m.service && m.service !== service) return false;
-        if(m.method  && m.method  !== method)  return false;
+        if(m.service && m.service !== context.service) return false;
+        if(m.method  && m.method  !== context.method)  return false;
         return true;
     });
 
     async.eachSeries(_beforeMiddleware, function(middleware, done) {
-        middleware.fn(data, function(err, result) {
+        middleware.fn.call(context, data, function(err, result) {
             if(err) {
                 return done(err);
             }
@@ -110,17 +109,24 @@ Client.prototype.call = function(service, method, data, callback) {
         if(err) {
             return callback(err);
         }
-        conn.call(method, data, function(err, data) {
+
+        let conn = self.connections[context.service];
+
+        if(!conn) {
+            return callback({ error: "unknown-service" });
+        }
+
+        conn.call(context.method, data, function(err, data) {
             if(err) {
                 return callback(err);
             }
             let _afterMiddleware = self.middleware.after.filter((m) => {
-                if(m.service && m.service !== service) return false;
-                if(m.method  && m.method  !== method)  return false;
+                if(m.service && m.service !== context.service) return false;
+                if(m.method  && m.method  !== context.method)  return false;
                 return true;
             });
             async.eachSeries(_afterMiddleware, function(middleware, done) {
-                middleware.fn(data, function(err, result) {
+                middleware.fn.call(context, data, function(err, result) {
                     if(err) {
                         return done(err);
                     }
@@ -131,7 +137,7 @@ Client.prototype.call = function(service, method, data, callback) {
                 if(err) {
                     return callback(err);
                 }
-                self.emit("called", service, method);
+                self.emit("called", context.service, context.method);
                 callback(null, data);
             });
         });
