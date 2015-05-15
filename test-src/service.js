@@ -425,6 +425,58 @@ describe("Service", function() {
 
   });
 
+  it("should expose method to middleware", function(done) {
+
+    let _method = "hello";
+
+    let transport = mockTransport();
+
+    let service = new Service(transport());
+
+    service.before(function(data, callback) {
+      assert.equal(this.method, _method);
+      return callback(null, data);
+    });
+
+    service.after(function(data, callback) {
+      assert.equal(this.method, _method);
+      return callback(null, data);
+    });
+
+    service.on(_method, (req, callback) => callback());
+
+    service.call(_method, "", function(err) {
+      assert.ifError(err);
+      return done();
+    });
+
+  });
+
+  it("should be able to change method in before middleware", function(done) {
+
+    let _method1 = "hello";
+    let _method2 = "world";
+
+    let transport = new mockTransport();
+
+    let service = new Service(transport());
+
+    service.before(function(data, callback) {
+      assert.equal(this.method, _method1);
+      this.method = _method2;
+      return callback(null, data);
+    });
+
+    service.on(_method2, (req, callback) => callback(null, req));
+
+    service.call(_method1, "hi", function(err, res) {
+      assert.ifError(err);
+      assert.equal(res, "hi");
+      done();
+    });
+
+  });
+
   it("should immediately return if server is not listening", function(done) {
 
     let service = new Service(mockTransport()());

@@ -30,30 +30,18 @@ let Service = function Service(Transports, config) {
     };
 
     this.fn = function(method, data, cb) {
-        let _tmp = self._methods[method];
-        if(!_tmp) return cb({ error: "unknown-method", method: method });
 
-        if(_tmp.schema) {
-            try {
-                if(!_tmp.schema.hasOwnProperty('$validators')) {
-                    data = s.Object(_tmp.schema).validate(data);
-                } else {
-                    data = _tmp.schema.validate(data);
-                }
-            } catch(e) {
-                return cb({
-                    error: e.message
-                });
-            }
-        }
+        let context = {
+            method
+        };
 
         let _beforeMiddleware = self._middleware.before.filter((m) => {
-            if(m.method && m.method !== method) return false;
+            if(m.method && m.method !== context.method) return false;
             return true;
         });
 
         async.eachSeries(_beforeMiddleware, function(middleware, done) {
-            middleware.fn(data, function(err, result) {
+            middleware.fn.call(context, data, function(err, result) {
                 if(err) {
                     return done(err);
                 }
@@ -65,6 +53,23 @@ let Service = function Service(Transports, config) {
                 return cb(err);
             }
 
+            let _tmp = self._methods[context.method];
+            if(!_tmp) return cb({ error: "unknown-method", method: context.method });
+
+            if(_tmp.schema) {
+                try {
+                    if(!_tmp.schema.hasOwnProperty('$validators')) {
+                        data = s.Object(_tmp.schema).validate(data);
+                    } else {
+                        data = _tmp.schema.validate(data);
+                    }
+                } catch(e) {
+                    return cb({
+                        error: e.message
+                    });
+                }
+            }
+
             let finish = function(err, response) {
 
                 if(err) {
@@ -72,12 +77,12 @@ let Service = function Service(Transports, config) {
                 }
 
                 let _afterMiddleware = self._middleware.after.filter((m) => {
-                    if(m.method && m.method !== method) return false;
+                    if(m.method && m.method !== context.method) return false;
                     return true;
                 });
 
                 async.eachSeries(_afterMiddleware, function(middleware, done) {
-                    middleware.fn(response, function(err, _response) {
+                    middleware.fn.call(context, response, function(err, _response) {
                         if(err) {
                             return done(err);
                         }
