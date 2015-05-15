@@ -167,6 +167,44 @@ describe("Local Transport", function() {
 
     });
 
+    it("should return undefined if no data is returned from service", function(done) {
+
+      let transport = new LOCAL();
+
+      let _server = new transport.Server(function(method, data, callback) {
+        callback();
+      });
+
+      let _client = new transport.Client();
+
+      _client.call("hello", "world", function(err, response) {
+        assert.ifError(err);
+        assert.strictEqual(response, undefined);
+        done();
+      });
+
+    });
+
+    it("should return error if data returned from service cannot be coerced to JSON", function(done) {
+
+      let transport = new LOCAL();
+
+      let response = {};
+      response.hello = response;
+
+      let _server = new transport.Server(function(method, data, callback) {
+        callback(null, response);
+      });
+
+      let _client = new transport.Client();
+
+      _client.call("hello", "world", function(err) {
+        assert.equal(err.error, "Converting circular structure to JSON");
+        done();
+      });
+
+    });
+
   });
 
   describe("forceJSON", function() {

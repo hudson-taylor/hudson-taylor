@@ -60,9 +60,6 @@ function LocalTransportClientWrapper(o) {
       if(response.error && response.error != responseErrKeyBefore) {
         // forceJSON error
         return callback(formatError(response));
-      } else {
-        // response has an 'error' key, pass through normally
-        return callback(null, response);
       }
 
       return callback(null, response);
