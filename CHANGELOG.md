@@ -1,3 +1,11 @@
+Changelog 5.1.0:
+
+ * Allow middleware to view/edit destination service/method.
+
+Changelog 5.0.1:
+
+ * Dependency upgrades
+
 Changelog 5.0.0:
 
  * Overhaul HTTP Transport to ensure SSL works.
