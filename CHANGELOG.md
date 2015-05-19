@@ -1,3 +1,7 @@
+Changelog 5.1.1:
+
+ * Upgrade async to version 1.0.0, 0.9.2 has a bug which makes tests fail.
+
 Changelog 5.1.0:
 
  * Allow middleware to view/edit destination service/method.
