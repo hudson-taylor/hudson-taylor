@@ -2,6 +2,7 @@
 "use strict";
 
 const assert = require("assert");
+const s      = require("ht-schema");
 
 const Client = require("../lib/client");
 
@@ -836,6 +837,115 @@ describe("Client", function() {
                     assert.equal(result, undefined);
                     done();
                 });
+
+        });
+
+    });
+
+    describe("schemas", function() {
+
+        it("should be able to add schemas", function() {
+
+            let client = new Client();
+
+            client.addSchema("hello", "hi", true);
+
+            assert.deepEqual(client.schemas, { hello: { hi: true } });
+
+            client.addSchema("hello", "hi2", false);
+
+            assert.deepEqual(client.schemas, {
+                hello: {
+                    hi: true,
+                    hi2: false
+                }
+            });
+
+        });
+
+        it("should work when response matches schema", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, {
+                            advanced: {
+                                schema: {
+                                    array: [ 5, "hello" ]
+                                }
+                            }
+                        });
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            client.addSchema("s1", "method", s.Object({
+                advanced: s.Object({
+                    schema: s.Object({
+                        array: s.TypedArray([ s.Number(), s.String() ])
+                    })
+                })
+            }));
+
+            client.call("s1", "method", function(err, data) {
+                assert.ifError(err);
+                assert.equal(data.advanced.schema.array[1], "hello");
+                done();
+            });
+
+        });
+
+        it("should wrap schema in s.Object if object is passed", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, { hello: "world" });
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            client.addSchema("s1", "method", { hello: s.String() });
+
+            client.call("s1", "method", function(err, data) {
+                assert.ifError(err);
+                assert.equal(data.hello, "world");
+                done();
+            });
+
+        });
+
+        it("should return an error if returned data does not match data", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, {
+                            basic: {
+                                schema: true
+                            }
+                        });
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            client.addSchema("s1", "method", s.Object({
+                basic: s.Object({
+                    schema: s.String() // this will actually return a boolean, so it won't validate
+                })
+            }));
+
+            client.call("s1", "method", {}, function(err, data) {
+                assert.equal(~err.error.indexOf("Failed to parse schema.basic"), -1);
+                assert.equal(data, undefined);
+                done();
+            });
 
         });
 

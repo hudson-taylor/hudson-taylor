@@ -5,12 +5,15 @@ const util   = require("util");
 const events = require("events");
 const async  = require("async");
 
+const s = require("ht-schema");
+
 const utils = require("./utils");
 
 let Client = function Client(services) {
 
     this.services    = {};
     this.connections = {};
+    this.schemas     = {};
 
     this.middleware  = {
         before: [],
@@ -18,7 +21,7 @@ let Client = function Client(services) {
     };
 
     for(let service in services) {
-        if(!services.hasOwnProperty(service)) continue;        
+        if(!services.hasOwnProperty(service)) continue;
         this.add(service, services[service]);
     }
 
@@ -35,6 +38,13 @@ Client.prototype.add = function(name, transport) {
     this.connections[name] = client;
     this.emit("added", name);
 };
+
+Client.prototype.addSchema = function(service, method, schema) {
+  if(!this.schemas[service]) {
+    this.schemas[service] = {};
+  }
+  this.schemas[service][method] = schema;
+}
 
 Client.prototype.connect = function(done) {
     let self = this;
@@ -137,6 +147,22 @@ Client.prototype.call = function(service, method, data, callback) {
                 if(err) {
                     return callback(err);
                 }
+
+                if(self.schemas[context.service] && self.schemas[context.service][context.method]) {
+                  let schema = self.schemas[context.service][context.method];
+                  try {
+                    if(!schema.hasOwnProperty('$validators')) {
+                      data = s.Object(schema).validate(data);
+                    } else {
+                      data = schema.validate(data);
+                    }
+                  } catch(e) {
+                    return callback({
+                      error: e.message
+                    });
+                  }
+                }
+
                 self.emit("called", context.service, context.method);
                 callback(null, data);
             });
