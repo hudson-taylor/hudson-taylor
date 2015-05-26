@@ -41,10 +41,10 @@
   },
   "homepage": "https://github.com/hudson-taylor/hudson-taylor",
   "dependencies": {
-    "async": "^1.0.0",
-    "body-parser": "^1.12.4",
-    "express": "^4.9.0",
-    "ht-schema": "^2.0.2",
+    "async": "~1.0.0",
+    "body-parser": "~1.12.4",
+    "express": "~4.9.0",
+    "ht-schema": "~2.0.2",
     "uid2": "0.0.3"
   },
   "devDependencies": {
