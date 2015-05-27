@@ -13,13 +13,12 @@ var multiplyBy = 5;
 // and Client or else this won"t work!
 var mathTransport = new Transports.Local();
 
-var mathService = new Service(mathTransport, {logger : console.log});
+var mathService = new Service(mathTransport);
 
 mathService.on("multiply", s.Object({
     number: s.Number(),
     by:     s.Number()
-}), function(data, callback, logger) {
-    logger(data);
+}), function(data, callback) {
     callback(null, data.number * data.by);
 });
 
