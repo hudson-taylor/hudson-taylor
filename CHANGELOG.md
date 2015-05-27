@@ -1,3 +1,7 @@
+Changelog 5.2.0:
+
+ * Add support for validating the response of a call with a schema.
+
 Changelog 5.1.1:
 
  * Upgrade async to version 1.0.0, 0.9.2 has a bug which makes tests fail.
