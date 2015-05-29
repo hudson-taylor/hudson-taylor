@@ -10,6 +10,3 @@ after_success:
   - "npm run push-coverage"
 notifications:
   irc: "chat.freenode.net#htjs"
-  hipchat:
-    rooms:
-      secure: Q8Rw1P3Laj1fGtB6YX3FXC678VV66yCMAWKbIrePPNG14mqf9S+TICybqmFO18LHXkPiX+2Opt5yfUwx/QHyX+8IL1NVOpdz4o+E3+srIW8aT9pr3t4PspWKkphSCtI41IPTEkPLMLbhSsQ26DJM8r+qyuzjG5ccfczUvfukO7Y=
