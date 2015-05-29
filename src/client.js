@@ -259,9 +259,20 @@ Client.prototype.end = function(callback) {
     let methods = tmp.map(function(serviceCall) {
 
         let call = {
+          service: serviceCall.service,
+          method: "$htMultiCall",
+          data:   serviceCall.calls
+        };
+
+        if(serviceCall.calls.length === 1) {
+          // If we're only calling 1 method on the
+          // service, call it directly and don't
+          // use $htMultiCall
+          call = {
             service: serviceCall.service,
-            method: "$htMultiCall",
-            data:   serviceCall.calls
+            method:  serviceCall.calls[0].method,
+            data:    serviceCall.calls[0].data
+          };
         }
 
         return call;

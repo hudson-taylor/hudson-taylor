@@ -798,15 +798,15 @@ describe("Client", function() {
             let services = {
                 s1: mockTransport({
                     call(method, data, callback) {
-                        assert.equal(data[0].data, str);
-                        return callback(null, data[0].data);
+                        assert.equal(data, str);
+                        return callback(null, data);
                     }
                 })(),
                 s2: mockTransport({
                     call(method, data, callback) {
                         // reverse
-                        assert.equal(data[0].data, str);
-                        return callback(null, data[0].data.split("").reverse().join(""));
+                        assert.equal(data, str);
+                        return callback(null, data.split("").reverse().join(""));
                     }
                 })()
             };
@@ -825,18 +825,47 @@ describe("Client", function() {
 
             let client = new Client({});
 
-            client.chain("s1", "method")
-                .end(function(err, result) {
-                    assert.deepEqual(err, {
-                        service: "s1",
-                        method: "$htMultiCall",
-                        error: {
-                            error: "unknown-service"
-                        }
-                    });
-                    assert.equal(result, undefined);
-                    done();
+            client.chain("s1", "method").end(function(err, result) {
+                assert.deepEqual(err, {
+                    service: "s1",
+                    method: "method",
+                    error: {
+                        error: "unknown-service"
+                    }
                 });
+                assert.equal(result, undefined);
+                done();
+            });
+
+        });
+
+        it("should use normal call instead of $htMultiCall if there is only 1 method being called on a service", function(done) {
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        assert.equal(method, "m1");
+                        return callback(null, _data);
+                    }
+                })(),
+                s2: mockTransport({
+                    call(method, data, callback) {
+                        assert.equal(method, "$htMultiCall");
+                        assert.equal(data[0].method, "m1");
+                        assert.equal(data[1].method, "m2");
+                        assert.deepEqual(data[0].data, _data);
+                        return callback(null, _data2);
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            client.chain("s1", "m1").chain("s2", "m1").chain("s2", "m2").end(function(err, data) {
+                assert.ifError(err);
+                assert.deepEqual(data, _data2);
+                done();
+            });
 
         });
 
