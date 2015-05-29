@@ -227,6 +227,10 @@ Client.prototype.chain = function(service, method, data) {
 
 Client.prototype.end = function(callback) {
 
+    if(!this.isChain) {
+      return callback(new Error("Client.end called on a non-chained HT client."));
+    }
+
     let tmp = this.chainedMethods.reduce(function(previous, method) {
 
         let last = previous[previous.length - 1];

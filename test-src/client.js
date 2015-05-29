@@ -840,6 +840,17 @@ describe("Client", function() {
 
         });
 
+        it("should return error if end is called on a non-chain", function(done) {
+
+            let client = new Client({});
+
+            client.end(function(err) {
+                assert.equal(err.message, "Client.end called on a non-chained HT client.");
+                done();
+            });
+
+        });
+
     });
 
     describe("schemas", function() {
