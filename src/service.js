@@ -110,7 +110,7 @@ let Service = function Service(Transports, config) {
             data:    s.Any({ opt: true })
         })
     ]), function(data, callback) {
-        utils.getLastResult.bind(self)(data, callback, true);
+        utils.getLastResult.call(self, data, callback, true);
     });
 
     Transports.forEach(function(transport) {

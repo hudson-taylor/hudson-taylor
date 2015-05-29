@@ -279,7 +279,7 @@ Client.prototype.end = function(callback) {
 
     });
 
-    utils.getLastResult.bind(this)(methods, callback);
+    utils.getLastResult.call(this, methods, callback);
 
 }
 
