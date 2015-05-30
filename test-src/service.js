@@ -241,6 +241,7 @@ describe("Service", function() {
 
     service.call("double", { number: "hello" }, function(err) {
 
+      assert.equal(err.$htValidationError, true);
       assert.equal(err.error, "Failed to parse schema.number: required Number, received string");
 
       done();

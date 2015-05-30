@@ -158,6 +158,7 @@ Client.prototype.call = function(service, method, data, callback) {
                     }
                   } catch(e) {
                     return callback({
+                      $htValidationError: true,
                       error: e.message
                     });
                   }

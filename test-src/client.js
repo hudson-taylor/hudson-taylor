@@ -959,7 +959,7 @@ describe("Client", function() {
 
         });
 
-        it("should return an error if returned data does not match data", function(done) {
+        it("should return an error if returned data does not match schema", function(done) {
 
             let services = {
                 s1: mockTransport({
@@ -982,6 +982,7 @@ describe("Client", function() {
             }));
 
             client.call("s1", "method", {}, function(err, data) {
+                assert.equal(err.$htValidationError, true);
                 assert.equal(~err.error.indexOf("Failed to parse schema.basic"), -1);
                 assert.equal(data, undefined);
                 done();

@@ -65,6 +65,7 @@ let Service = function Service(Transports, config) {
                     }
                 } catch(e) {
                     return cb({
+                        $htValidationError: true,
                         error: e.message
                     });
                 }
