@@ -1,3 +1,7 @@
+Changelog 5.3.0:
+
+ * Return $htValidationError: true along with message when data does not match schema.
+
 Changelog 5.2.0:
 
  * Add support for validating the response of a call with a schema.
