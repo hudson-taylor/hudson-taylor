@@ -24,7 +24,7 @@ horizontally.
 
 *Note:* If you see **HT2** anywhere, this references the new rewrite, and is applicable to any version >=2.x.x
 
-Current Version: 5.3.0
+Current Version: 5.3.1
 
 See [Changelog here](CHANGELOG.md)
 

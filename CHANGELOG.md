@@ -1,3 +1,7 @@
+Changelog 5.3.1:
+
+ * Deprecate utils.expressProxy in favour of ht-express
+
 Changelog 5.3.0:
 
  * Return $htValidationError: true along with message when data does not match schema.
