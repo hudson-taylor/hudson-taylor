@@ -2,18 +2,13 @@
 "use strict";
 
 const async = require("async");
+const util  = require("util");
 
-var expressProxy = function(remote, serviceName, signal) {
+var expressProxy = util.deprecate(function(remote, serviceName, signal) {
 
-    /* expressProxy returns an express route handler for that combines:
-     *
-     * - post body vars (see express body-parser)
-     * - router matches ie /:id
-     * - query params: ?foo=bar
-     *
-     * into an object and passes them on to an HT service remote call,
-     * the result of which will be returned as a json response.
-     */
+    /*******************************************************************************************************
+        expressProxy has been deprecated, please use https://github.com/hudson-taylor/ht-express instead. 
+    *******************************************************************************************************/
 
     return (function() {
 
@@ -33,7 +28,7 @@ var expressProxy = function(remote, serviceName, signal) {
 
     })();
 
-};
+}, "expressProxy is deprecated as of 5.3.1 - please use https://github.com/hudson-taylor/ht-express instead.");
 
 var merge = function merge() {
 
