@@ -3,10 +3,7 @@ node_js:
   - "0.10"
   - "0.12"
   - "iojs"
-before_install:
-  - "npm install"
-after_success:
-  - "npm run coverage"
-  - "npm run push-coverage"
+script: "npm run coverage"
+after_success: "npm run push-coverage"
 notifications:
   irc: "chat.freenode.net#htjs"
