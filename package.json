@@ -44,8 +44,7 @@
     "async": "~1.0.0",
     "body-parser": "~1.12.4",
     "express": "~4.9.0",
-    "ht-schema": "~2.0.2",
-    "uid2": "0.0.3"
+    "ht-schema": "~2.0.2"
   },
   "devDependencies": {
     "babel": "^5.4.4",

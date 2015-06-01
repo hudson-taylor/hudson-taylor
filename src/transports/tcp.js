@@ -1,8 +1,7 @@
 "use strict";
 
-const net = require("net");
-
-const uid2 = require("uid2");
+const net    = require("net");
+const crypto = require("crypto");
 
 function TCPTransportServer(config) {
 
@@ -109,7 +108,9 @@ function TCPTransportClient(config) {
                 error: "disconnected"
             });
         }
-        let id = uid2(10);
+        // Chances of this returning the same id
+        // as one in use is extremely negligible.
+        let id = crypto.randomBytes(10).toString("hex");
         let request = JSON.stringify({
             name: method,
             data,
