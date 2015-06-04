@@ -1,3 +1,8 @@
+Changelog 5.3.2:
+
+ * Remove uid2 as a dependency.
+ * Upgrade other dependencies.
+
 Changelog 5.3.1:
 
  * Deprecate utils.expressProxy in favour of ht-express
