@@ -41,18 +41,18 @@
   },
   "homepage": "https://github.com/hudson-taylor/hudson-taylor",
   "dependencies": {
-    "async": "~1.0.0",
+    "async": "~1.2.0",
     "body-parser": "~1.12.4",
-    "express": "~4.9.0",
+    "express": "~4.12.4",
     "ht-schema": "~2.0.2"
   },
   "devDependencies": {
-    "babel": "^5.4.4",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.14",
-    "mocha": "^2.1.0",
+    "babel": "~5.4.4",
+    "coveralls": "~2.11.2",
+    "istanbul": "~0.3.14",
+    "mocha": "~2.1.0",
     "openport": "0.0.3",
-    "request": "^2.42.0",
-    "supertest": "^1.0.1"
+    "request": "~2.57.0",
+    "supertest": "~1.0.1"
   }
 }
