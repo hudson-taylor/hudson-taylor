@@ -174,23 +174,8 @@ Hudson-Taylors schema library is no longer bundled directly, see [ht-schema](htt
 
 ## Utils
 
-### ht.utils.expressProxy
+### Express Proxy
 
-expressProxy is a helper that lets you map express.js routes to ht service calls.
-The proxy looks for and merges: request.body, request.params, request.query.
+Proxy express requests to a particular service method.
 
-```javascript
-var express = require("express");
-var ht      = require("hudson-taylor");
-
-var remote = new ht.Client({
-    myService: new ht.Transports.HTTP({ host: "127.0.0.1", port: 7001 })
-});
-
-var app = express();
-
-app.get('/api/echo/:message', ht.utils.expressProxy(remote, "myService", "echo"));
-
-// etc...
-
-```
+See [ht-express](https://github.com/hudson-taylor/ht-express)

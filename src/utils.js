@@ -4,32 +4,6 @@
 const async = require("async");
 const util  = require("util");
 
-var expressProxy = util.deprecate(function(remote, serviceName, signal) {
-
-    /*******************************************************************************************************
-        expressProxy has been deprecated, please use https://github.com/hudson-taylor/ht-express instead. 
-    *******************************************************************************************************/
-
-    return (function() {
-
-        return function expressProxy(req, res) {
-            let bits = [];
-            if(req.body) bits.push(req.body);
-            if(req.params) bits.push(req.params);
-            if(req.query) bits.push(req.query);
-            let payload = exports.merge.apply(null, bits);
-            remote.call(serviceName, signal, payload, function(err, data) {
-                if(err) {
-                    return res.status(500).json(formatError(err));
-                }
-                return res.json(data);
-            });
-        };
-
-    })();
-
-}, "expressProxy is deprecated as of 5.3.1 - please use https://github.com/hudson-taylor/ht-express instead.");
-
 var merge = function merge() {
 
     // Merge objects passed as arguments, left to right precidence.
@@ -110,7 +84,6 @@ var getLastResult = function getLastResult(methods, callback, isService) {
 }
 
 export {
-    expressProxy,
     merge,
     formatError,
     getLastResult

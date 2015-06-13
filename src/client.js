@@ -172,9 +172,6 @@ Client.prototype.call = function(service, method, data, callback) {
 
 };
 
-// For backwards compatibility with HT1.x
-Client.prototype.remote = util.deprecate(Client.prototype.call, "Client.remote() has been deprecated, use Client.call() instead.");
-
 Client.prototype.before = function(fn, opts = {}) {
     let { service, method } = opts;
     this.middleware.before.push({
