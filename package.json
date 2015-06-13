@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "npm run build && mocha --recursive --reporter spec --bail --check-leaks test/",
-    "build": "node ./node_modules/babel/bin/babel src -d lib && node ./node_modules/babel/bin/babel test-src -d test",
+    "build": "./node_modules/.bin/babel src -d lib && ./node_modules/.bin/babel test-src -d test",
     "coverage": "npm run build && ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --ui bdd --recursive -R spec -t 5000",
     "push-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "prepublish": "npm run build"
@@ -47,7 +47,7 @@
     "ht-schema": "~2.0.2"
   },
   "devDependencies": {
-    "babel": "~5.4.4",
+    "babel": "~5.5.7",
     "coveralls": "~2.11.2",
     "istanbul": "~0.3.14",
     "mocha": "~2.1.0",
