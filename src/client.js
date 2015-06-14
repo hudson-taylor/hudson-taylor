@@ -43,6 +43,9 @@ Client.prototype.addSchema = function(service, method, schema) {
   if(!this.schemas[service]) {
     this.schemas[service] = {};
   }
+  if(typeof schema.validate !== 'function') {
+    throw new Error("Schema for " + method + " does not have a validate function.");
+  }
   this.schemas[service][method] = schema;
 }
 
@@ -148,24 +151,26 @@ Client.prototype.call = function(service, method, data, callback) {
                     return callback(err);
                 }
 
-                if(self.schemas[context.service] && self.schemas[context.service][context.method]) {
-                  let schema = self.schemas[context.service][context.method];
-                  try {
-                    if(!schema.hasOwnProperty('$validators')) {
-                      data = s.Object(schema).validate(data);
-                    } else {
-                      data = schema.validate(data);
-                    }
-                  } catch(e) {
-                    return callback({
-                      $htValidationError: true,
-                      error: e.message
-                    });
-                  }
+                let finish = function(data) {
+                  self.emit("called", context.service, context.method);
+                  return callback(null, data);
                 }
 
-                self.emit("called", context.service, context.method);
-                callback(null, data);
+                if(self.schemas[context.service] && self.schemas[context.service][context.method]) {
+                  let schema = self.schemas[context.service][context.method];
+                  schema.validate(data, function(err, data) {
+                    if(err) {
+                      return callback({
+                        $htValidationError: true,
+                        error: err.message
+                      });
+                    }
+                    return finish(data);
+                  });
+                } else {
+                  return finish(data);
+                }
+
             });
         });
     });

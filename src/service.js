@@ -56,21 +56,6 @@ let Service = function Service(Transports, config) {
             let _tmp = self._methods[context.method];
             if(!_tmp) return cb({ error: "unknown-method", method: context.method });
 
-            if(_tmp.schema) {
-                try {
-                    if(!_tmp.schema.hasOwnProperty('$validators')) {
-                        data = s.Object(_tmp.schema).validate(data);
-                    } else {
-                        data = _tmp.schema.validate(data);
-                    }
-                } catch(e) {
-                    return cb({
-                        $htValidationError: true,
-                        error: e.message
-                    });
-                }
-            }
-
             let finish = function(err, response) {
 
                 if(err) {
@@ -99,7 +84,20 @@ let Service = function Service(Transports, config) {
 
             };
 
-            _tmp.fn(data, finish);
+            if(_tmp.schema) {
+                _tmp.schema.validate(data, function(err, data) {
+                    if(err) {
+                        return cb({
+                            $htValidationError: true,
+                            error: err.message
+                        });
+                    }
+                    return _tmp.fn(data, finish);
+                });
+            } else {
+                _tmp.fn(data, finish);
+            }
+
 
         });
 
@@ -135,6 +133,12 @@ Service.prototype.on = function(method, schema, fn) {
     if(!fn) {
         fn = schema;
         schema = null;
+    }
+
+    if(schema) {
+        if(typeof schema.validate !== 'function') {
+            throw new Error("Schema for " + method + " does not have a validate function.");
+        }
     }
 
     this._methods[method] = {

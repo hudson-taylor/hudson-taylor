@@ -233,9 +233,9 @@ describe("Service", function() {
 
     let service = new Service(transport());
 
-    service.on("double", {
+    service.on("double", s.Object({
       number: s.Number()
-    }, function(request, callback) {
+    }), function(request, callback) {
       return callback(null, request.number * 2);
     });
 
@@ -246,6 +246,16 @@ describe("Service", function() {
 
       done();
 
+    });
+
+  });
+
+  it("should throw if schema does not have validate function", function() {
+
+    let service = new Service();
+
+    assert.throws(function() {
+      service.on("hello", true, function(err, data) {});
     });
 
   });

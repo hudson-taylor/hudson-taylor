@@ -868,18 +868,13 @@ describe("Client", function() {
 
             let client = new Client();
 
-            client.addSchema("hello", "hi", true);
+            client.addSchema("hello", "hi", s.String());
 
-            assert.deepEqual(client.schemas, { hello: { hi: true } });
+            assert.equal(Object.keys(client.schemas.hello).length, 1);
 
-            client.addSchema("hello", "hi2", false);
+            client.addSchema("hello", "hi2", s.String());
 
-            assert.deepEqual(client.schemas, {
-                hello: {
-                    hi: true,
-                    hi2: false
-                }
-            });
+            assert.equal(Object.keys(client.schemas.hello).length, 2);
 
         });
 
@@ -917,28 +912,6 @@ describe("Client", function() {
 
         });
 
-        it("should wrap schema in s.Object if object is passed", function(done) {
-
-            let services = {
-                s1: mockTransport({
-                    call(method, data, callback) {
-                        return callback(null, { hello: "world" });
-                    }
-                })()
-            }
-
-            let client = new Client(services);
-
-            client.addSchema("s1", "method", { hello: s.String() });
-
-            client.call("s1", "method", function(err, data) {
-                assert.ifError(err);
-                assert.equal(data.hello, "world");
-                done();
-            });
-
-        });
-
         it("should return an error if returned data does not match schema", function(done) {
 
             let services = {
@@ -966,6 +939,16 @@ describe("Client", function() {
                 assert.equal(~err.error.indexOf("Failed to parse schema.basic"), -1);
                 assert.equal(data, undefined);
                 done();
+            });
+
+        });
+
+        it("should throw if schema does not have validate function", function() {
+
+            let client = new Client();
+
+            assert.throws(function() {
+                client.addSchema("s1", "method", true);
             });
 
         });
