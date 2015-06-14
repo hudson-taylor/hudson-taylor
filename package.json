@@ -44,13 +44,13 @@
     "async": "~1.2.0",
     "body-parser": "~1.12.4",
     "express": "~4.12.4",
-    "ht-schema": "~2.0.2"
+    "ht-schema": "~3.0.0"
   },
   "devDependencies": {
-    "babel": "~5.5.7",
+    "babel": "~5.5.8",
     "coveralls": "~2.11.2",
-    "istanbul": "~0.3.14",
-    "mocha": "~2.1.0",
+    "istanbul": "~0.3.15",
+    "mocha": "~2.2.5",
     "openport": "0.0.3",
     "request": "~2.57.0",
     "supertest": "~1.0.1"
