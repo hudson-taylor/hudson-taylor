@@ -700,23 +700,20 @@ describe("Client", function() {
             let services = {
                 s1: mockTransport({
                     call(method, data, callback) {
-                        switch(method) {
-                            case "$htMultiCall": {
-                                assert.deepEqual(data, [
-                                    {
-                                        method: "method1",
-                                        data: _data
-                                    },
-                                    {
-                                        method: "method2"
-                                    },
-                                    {
-                                        method: "method3"
-                                    }
-                                ]);
-                                return callback(null, _data4);
+                        assert.equal(method, "$htMultiCall");
+                        assert.deepEqual(data, [
+                            {
+                                method: "method1",
+                                data: _data
+                            },
+                            {
+                                method: "method2"
+                            },
+                            {
+                                method: "method3"
                             }
-                        }
+                        ]);
+                        return callback(null, _data4);
                     }
                 })()
             };
@@ -739,21 +736,18 @@ describe("Client", function() {
             let services = {
                 s1: mockTransport({
                     call(method, data, callback) {
-                        switch(method) {
-                            case "$htMultiCall": {
-                                assert.deepEqual(data, [
-                                    {
-                                        method: "method1",
-                                        data: _data
-                                    },
-                                    {
-                                        method: "method2",
-                                        data: _data4
-                                    }
-                                ]);
-                                return callback(null, _data3);
+                        assert.equal(method, "$htMultiCall");
+                        assert.deepEqual(data, [
+                            {
+                                method: "method1",
+                                data: _data
+                            },
+                            {
+                                method: "method2",
+                                data: _data4
                             }
-                        }
+                        ]);
+                        return callback(null, _data3);
                     }
                 })()
             };
