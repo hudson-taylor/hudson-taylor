@@ -1,3 +1,11 @@
+Changelog 6.0.0:
+
+ * Deprecated function Client.remote removed.
+ * Deprecated function utils.expressProxy removed.
+ * Dependencies updated.
+ * Automatic wrapping of top-level schemas has been removed to support other validation libraries.
+ * Internal validation switched to async to support other validation libraries.
+
 Changelog 5.3.2:
 
  * Remove uid2 as a dependency.
