@@ -71,6 +71,9 @@ function LocalTransportClientWrapper(o) {
 }
 
 function LocalTransport() {
+  if(!(this instanceof LocalTransport)) {
+    return new LocalTransport();
+  }
   var o = {};
   this.Server = LocalTransportServerWrapper(o);
   this.Client = LocalTransportClientWrapper(o);

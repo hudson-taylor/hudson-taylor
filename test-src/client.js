@@ -59,6 +59,15 @@ describe("Client", function() {
 
         });
 
+        it("should not require new keyword for creation", function() {
+
+            let client = Client();
+
+            assert.equal(client instanceof Client, true);
+            assert.deepEqual(client.services, {});
+
+        });
+
     });
 
     describe("connect", function() {

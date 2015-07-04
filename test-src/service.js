@@ -43,6 +43,15 @@ describe("Service", function() {
 
   });
 
+  it("should not require new keyword for creation", function() {
+
+    let service = Service();
+
+    assert.equal(service instanceof Service, true);
+    assert.equal(service._servers.length, 0);
+
+  });
+
   it("should allow adding transport after service has been created", function(done) {
 
     let service = new Service();

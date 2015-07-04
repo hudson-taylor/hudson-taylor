@@ -11,6 +11,10 @@ const utils = require("./utils");
 
 let Client = function Client(services) {
 
+    if(!(this instanceof Client)) {
+        return new Client(services);
+    }
+
     this.services    = {};
     this.connections = {};
     this.schemas     = {};

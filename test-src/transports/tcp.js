@@ -32,6 +32,14 @@ describe("TCP Transport", function() {
 
 		});
 
+		it("should not require new keyword for creation", function() {
+
+			let transport = TCP({ port, host });
+
+			assert.equal(transport instanceof TCP, true);
+
+		});
+
 	});
 
 	describe("Server", function() {

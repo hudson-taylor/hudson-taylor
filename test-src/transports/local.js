@@ -19,6 +19,14 @@ describe("Local Transport", function() {
 
     });
 
+    it("should not require new keyword for creation", function() {
+
+      let transport = LOCAL();
+
+      assert.equal(transport instanceof LOCAL, true);
+
+    });
+
     it("should provide noop'd versions of unused methods", function() {
 
       let noop = () => {};

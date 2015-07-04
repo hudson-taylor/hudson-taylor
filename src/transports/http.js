@@ -143,6 +143,9 @@ function HTTPTransportClient(config) {
 }
 
 function HTTPTransport(config) {
+    if(!(this instanceof HTTPTransport)) {
+        return new HTTPTransport(config);
+    }
     // This parent instance should return both Server and Client.
     // You can also setup things that both Server & Client need
     // access to here, configuration, FDs etc.

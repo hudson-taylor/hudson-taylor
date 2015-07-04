@@ -126,6 +126,9 @@ function TCPTransportClient(config) {
 }
 
 function TCPTransport(config) {
+    if(!(this instanceof TCPTransport)) {
+        return new TCPTransport(config);
+    }
     this.Server = TCPTransportServer(config);
     this.Client = TCPTransportClient(config);
 }

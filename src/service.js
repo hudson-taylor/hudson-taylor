@@ -9,6 +9,10 @@ const utils = require("./utils");
 let Service = function Service(Transports, config) {
     let self = this;
 
+    if(!(this instanceof Service)) {
+        return new Service(Transports, config);
+    }
+
     if(typeof (Transports||{}).Server == 'function') {
         Transports = [ Transports ];
     } else if(typeof Transports == 'object' && !Array.isArray(Transports)) {

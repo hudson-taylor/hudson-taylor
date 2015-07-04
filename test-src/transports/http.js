@@ -80,6 +80,14 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should not require new keyword for creation", function() {
+
+			let transport = HTTP({ port, host });
+
+			assert.equal(transport instanceof HTTP, true);
+
+		});
+
 	});
 
 	describe("Server", function() {
