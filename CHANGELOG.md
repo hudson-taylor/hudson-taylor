@@ -1,3 +1,7 @@
+Changelog 6.0.2:
+
+ * Dependencies updated.
+
 Changelog 6.0.1:
 
  * Allow creation of instances without new
