@@ -1,3 +1,11 @@
+Changelog 6.0.4:
+
+ * Dependencies updated.
+
+Changelog 6.0.3:
+
+ * Dependencies updated.
+
 Changelog 6.0.2:
 
  * Dependencies updated.
