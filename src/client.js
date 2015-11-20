@@ -54,15 +54,14 @@ Client.prototype.addSchema = function(service, method, schema) {
 }
 
 Client.prototype.connect = function(done) {
-    let self = this;
 
-    async.each(Object.keys(this.services), function(name, cb) {
+    async.each(Object.keys(this.services), (name, cb) => {
 
-        self.connections[name].connect(function(err) { 
+        this.connections[name].connect((err) => {
             if(err) {
                 return cb(err);
             }
-            self.emit("connected", name);
+            this.emit("connected", name);
             cb();
 
         });
@@ -72,16 +71,15 @@ Client.prototype.connect = function(done) {
 };
 
 Client.prototype.disconnect = function(done) {
-    let self = this;
 
-    async.each(Object.keys(this.connections), function(name, cb) {
+    async.each(Object.keys(this.connections), (name, cb) => {
 
-        self.connections[name].disconnect(function(err) {
+        this.connections[name].disconnect((err) => {
             if(err) {
                 return cb(err);
             }
-            delete self.connections[name];
-            self.emit("disconnected", name);
+            delete this.connections[name];
+            this.emit("disconnected", name);
             cb();
         });
 
@@ -90,7 +88,6 @@ Client.prototype.disconnect = function(done) {
 };
 
 Client.prototype.call = function(service, method, data, callback) {
-    let self = this;
 
     let context = {
         service,
@@ -108,7 +105,7 @@ Client.prototype.call = function(service, method, data, callback) {
         data = undefined;
     }
 
-    let _beforeMiddleware = self.middleware.before.filter((m) => {
+    let _beforeMiddleware = this.middleware.before.filter((m) => {
         if(m.service && m.service !== context.service) return false;
         if(m.method  && m.method  !== context.method)  return false;
         return true;
@@ -122,22 +119,22 @@ Client.prototype.call = function(service, method, data, callback) {
             data = result;
             done();
         });
-    }, function(err) {
+    }, (err) => {
         if(err) {
             return callback(err);
         }
 
-        let conn = self.connections[context.service];
+        let conn = this.connections[context.service];
 
         if(!conn) {
             return callback({ error: "unknown-service" });
         }
 
-        conn.call(context.method, data, function(err, data) {
+        conn.call(context.method, data, (err, data) => {
             if(err) {
                 return callback(err);
             }
-            let _afterMiddleware = self.middleware.after.filter((m) => {
+            let _afterMiddleware = this.middleware.after.filter((m) => {
                 if(m.service && m.service !== context.service) return false;
                 if(m.method  && m.method  !== context.method)  return false;
                 return true;
@@ -150,18 +147,18 @@ Client.prototype.call = function(service, method, data, callback) {
                     data = result;
                     done();
                 });
-            }, function(err) {
+            }, (err) => {
                 if(err) {
                     return callback(err);
                 }
 
-                let finish = function(data) {
-                  self.emit("called", context.service, context.method);
+                let finish = (data) => {
+                  this.emit("called", context.service, context.method);
                   return callback(null, data);
                 }
 
-                if(self.schemas[context.service] && self.schemas[context.service][context.method]) {
-                  let schema = self.schemas[context.service][context.method];
+                if(this.schemas[context.service] && this.schemas[context.service][context.method]) {
+                  let schema = this.schemas[context.service][context.method];
                   schema.validate(data, function(err, data) {
                     if(err) {
                       return callback({

@@ -25,8 +25,6 @@ function TCPTransportServer(config) {
     };
 
     _TCPTransportServer.prototype.listen = function(done) {
-        let self = this;
-
         if(this.listening) {
             return done();
         }
@@ -35,22 +33,21 @@ function TCPTransportServer(config) {
             return done(err);
         });
 
-        this.server.listen(config.port, config.host, function() {
-            self.listening = true;
+        this.server.listen(config.port, config.host, () => {
+            this.listening = true;
             done();
         });
     };
 
     _TCPTransportServer.prototype.stop = function(done) {
-        let self = this;
         if(!this.listening) {
             return done();
         }
-        this.server.close(function(err) {
+        this.server.close((err) => {
             if(err) {
                 return done(err);
             }
-            self.listening = false;
+            this.listening = false;
             done();
         });
     };
@@ -66,21 +63,20 @@ function TCPTransportClient(config) {
     };
 
     _TCPTransportClient.prototype.connect = function(done) {
-        let self = this;
         // open a persistent connection to the server
         this.conn = net.createConnection(config.port, config.host);
         this.conn.setEncoding("utf8");
-        this.conn.on("connect", function() {
-            self.connected = true;
+        this.conn.on("connect", () => {
+            this.connected = true;
             done();
         });
-        this.conn.on("data", function(d) {
+        this.conn.on("data", (d) => {
 
             let response            = JSON.parse(d);
             let { id, error, data } = response;
 
             // find callback we stashed
-            let fn = self.fns[id];
+            let fn = this.fns[id];
             if(!fn) {
                 // unknown, drop
                 return;

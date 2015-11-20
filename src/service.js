@@ -7,7 +7,6 @@ const s       = require("ht-schema");
 const utils = require("./utils");
 
 let Service = function Service(Transports, config) {
-    let self = this;
 
     if(!(this instanceof Service)) {
         return new Service(Transports, config);
@@ -33,13 +32,13 @@ let Service = function Service(Transports, config) {
         after:  []
     };
 
-    this.fn = function(method, data, cb) {
+    this.fn = (method, data, cb) => {
 
         let context = {
             method
         };
 
-        let _beforeMiddleware = self._middleware.before.filter((m) => {
+        let _beforeMiddleware = this._middleware.before.filter((m) => {
             if(m.method && m.method !== context.method) return false;
             return true;
         });
@@ -52,21 +51,21 @@ let Service = function Service(Transports, config) {
                 data = result;
                 done();
             });
-        }, function(err) {
+        }, (err) => {
             if(err) {
                 return cb(err);
             }
 
-            let _tmp = self._methods[context.method];
+            let _tmp = this._methods[context.method];
             if(!_tmp) return cb({ error: "unknown-method", method: context.method });
 
-            let finish = function(err, response) {
+            let finish = (err, response) => {
 
                 if(err) {
                     return cb(err);
                 }
 
-                let _afterMiddleware = self._middleware.after.filter((m) => {
+                let _afterMiddleware = this._middleware.after.filter((m) => {
                     if(m.method && m.method !== context.method) return false;
                     return true;
                 });
@@ -112,12 +111,12 @@ let Service = function Service(Transports, config) {
             method:  s.String(),
             data:    s.Any({ opt: true })
         })
-    ]), function(data, callback) {
-        utils.getLastResult.call(self, data, callback, true);
+    ]), (data, callback) => {
+        utils.getLastResult.call(this, data, callback, true);
     });
 
-    Transports.forEach(function(transport) {
-        self.addTransport(transport);
+    Transports.forEach((transport) => {
+        this.addTransport(transport);
     });
 
 };
@@ -169,29 +168,27 @@ Service.prototype.after = function(fn, opts = {}) {
 };
 
 Service.prototype.listen = function(done = () => {}) {
-    let self = this;
-    if(self.listening) return done();
+    if(this.listening) return done();
     async.each(this._servers, function(s, cb) {
         s.listen(cb);
-    }, function(err) {
+    }, (err) => {
         if(err) {
             return done(err);
         }
-        self.listening = true;
+        this.listening = true;
         done();
     });
 };
 
 Service.prototype.stop = function(done = () => {}) {
-    let self = this;
-    if(!self.listening) return done();
+    if(!this.listening) return done();
     async.each(this._servers, function(s, cb) {
         s.stop(cb);
-    }, function(err) {
+    }, (err) => {
         if(err) {
             return done(err);
         }
-        self.listening = false;
+        this.listening = false;
         done();
     });
 };
