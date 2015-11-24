@@ -208,7 +208,7 @@ describe("HTTP Transport", function() {
 
 			let { cert, key, ca } = SSLKeys;
 
-			let transport =	 new HTTP({
+			let transport =	new HTTP({
 				port,
 				host,
 				ssl: {
@@ -245,6 +245,31 @@ describe("HTTP Transport", function() {
 
 					server.stop(done);
 
+				});
+
+			});
+
+		});
+
+		it("should stringify error if needed", function(done) {
+
+			let _errmsg = "hello world error";
+
+			server = new transport.Server(function(method, data, callback) {
+				callback(new Error(_errmsg));
+			});
+
+			server.listen(function(err) {
+				assert.ifError(err);
+
+				request({
+					url:    "http://" + host + ":" + port + "/ht",
+					method: "POST",
+					json:   { method: "blah", args: "blah" }
+				}, function(e, r, body) {
+					assert.ifError(e);
+					assert.deepEqual(body.error, _errmsg);
+					server.stop(done);
 				});
 
 			});

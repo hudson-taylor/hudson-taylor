@@ -7,8 +7,11 @@
 
 const http       = require("http");
 const https      = require("https");
+const path       = require("path");
 const express    = require("express");
 const bodyParser = require("body-parser");
+
+const utils = require(path.resolve(__dirname, "../utils"));
 
 function HTTPTransportServer(config) {
 
@@ -31,7 +34,7 @@ function HTTPTransportServer(config) {
             // communicate back to the client.
             fn(req.body.method, req.body.args, function(err, data) {
                 if(err) {
-                    return res.status(500).json({ error: err.toString() });
+                    return res.status(500).json(utils.formatError(err));
                 }
                 return res.json(data);
             });
