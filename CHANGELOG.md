@@ -1,3 +1,7 @@
+Changelog 6.0.5:
+
+ * Ensure errors are returned correctly to HTTP clients
+
 Changelog 6.0.4:
 
  * Dependencies updated.
