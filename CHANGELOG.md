@@ -1,3 +1,7 @@
+Changelog 6.0.6:
+
+ * Ensure HTTP client handles undefined response correctly
+
 Changelog 6.0.5:
 
  * Ensure errors are returned correctly to HTTP clients
