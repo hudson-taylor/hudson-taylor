@@ -392,6 +392,26 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should not crash if response is undefined", function(done) {
+
+			let app = express();
+			app.use(bodyParser.json());
+			app.post("/ht", function(req, res) {
+				res.json(undefined);
+			});
+
+			let client = new transport.Client();
+
+			let _server = app.listen(port, host, function() {
+				client.call('a', 'b', function(err, response) {
+					assert.ifError(err);
+					assert.strictEqual(response, undefined);
+					_server.close(done);
+				});
+			});
+
+		});
+
 	});
 
 });

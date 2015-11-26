@@ -124,6 +124,9 @@ function HTTPTransportClient(config) {
           });
           res.on('end', function() {
             try {
+              if(!response || response === 'undefined') {
+                return callback();
+              }
               var parsedJSON = JSON.parse(response);
               return callback(null, parsedJSON);
             } catch(e) {
