@@ -34,7 +34,9 @@ function HTTPTransportServer(config) {
             // communicate back to the client.
             fn(req.body.method, req.body.args, function(err, data) {
                 if(err) {
-                    return res.status(500).json(utils.formatError(err));
+                    return res.status(500).json({
+                        $htTransportError: utils.formatError(err).error
+                    });
                 }
                 return res.json(data);
             });
@@ -128,6 +130,9 @@ function HTTPTransportClient(config) {
                 return callback();
               }
               var parsedJSON = JSON.parse(response);
+              if(parsedJSON.$htTransportError) {
+                return callback(parsedJSON.$htTransportError)
+              }
               return callback(null, parsedJSON);
             } catch(e) {
               return callback(e);

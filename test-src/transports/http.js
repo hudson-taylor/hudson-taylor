@@ -191,7 +191,7 @@ describe("HTTP Transport", function() {
 				}, function(e, r, body) {
 					assert.ifError(e);
 					
-					assert.equal(body.error, _err);
+					assert.equal(body.$htTransportError, _err);
 
 					server.stop(done);
 
@@ -268,7 +268,7 @@ describe("HTTP Transport", function() {
 					json:   { method: "blah", args: "blah" }
 				}, function(e, r, body) {
 					assert.ifError(e);
-					assert.deepEqual(body.error, _errmsg);
+					assert.deepEqual(body.$htTransportError, _errmsg);
 					server.stop(done);
 				});
 
@@ -316,6 +316,30 @@ describe("HTTP Transport", function() {
 				client.call(_method, _data, function(err, response) {
 					assert.ifError(err);
 					assert.deepEqual(response, _data);
+					_server.close(done);
+				});
+			});
+
+		});
+
+		it("should successfully return error", function(done) {
+
+			let _method = "hello";
+			let _error  = "therewasanerror";
+
+			let app = express();
+			app.use(bodyParser.json());
+			app.post("/ht", function(req, res) {
+				res.json({
+					$htTransportError: _error
+				});
+			});
+
+			let client = new transport.Client();
+
+			let _server = app.listen(port, host, function() {
+				client.call(_method, null, function(err) {
+					assert.deepEqual(err, _error);
 					_server.close(done);
 				});
 			});
