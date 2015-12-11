@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "0.10"
   - "0.12"
-  - "iojs"
+  - "5"
 script: "npm run coverage"
 after_success: "npm run push-coverage"
 notifications:
