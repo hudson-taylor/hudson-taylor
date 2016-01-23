@@ -28,29 +28,29 @@ describe("Service", function() {
 
   describe("creation", function() {
 
-  it("should allow passing no transport", function() {
+    it("should allow passing no transport", function() {
 
-    let service = new Service();
+      let service = new Service();
 
-    assert.equal(service._servers.length, 0);
+      assert.equal(service._servers.length, 0);
 
-  });
+    });
 
-  it("should allow passing in just config", function() {
+    it("should allow passing in just config", function() {
 
-    let service = new Service(_data);
+      let service = new Service(_data);
 
-    assert.deepEqual(service.config, _data);
-    assert.equal(service._servers.length, 0);
+      assert.deepEqual(service.config, _data);
+      assert.equal(service._servers.length, 0);
 
-  });
+    });
 
-  it("should not require new keyword for creation", function() {
+    it("should not require new keyword for creation", function() {
 
-    let service = Service();
+      let service = Service();
 
-    assert.equal(service instanceof Service, true);
-    assert.equal(service._servers.length, 0);
+      assert.equal(service instanceof Service, true);
+      assert.equal(service._servers.length, 0);
 
     });
 
