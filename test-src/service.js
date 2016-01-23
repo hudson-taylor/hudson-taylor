@@ -1,8 +1,9 @@
 
 "use strict";
 
-const assert = require('assert');
-const s      = require('ht-schema');
+const assert   = require('assert');
+const s        = require('ht-schema');
+const bluebird = require('bluebird');
 
 const Service = require('../lib/service');
 
@@ -119,6 +120,24 @@ describe("Service", function() {
 
       assert.throws(function() {
         service.on("hello", true, function(err, data) {});
+      });
+
+    });
+
+    it("should allow returning promise from function", function(done) {
+
+      let service = new Service();
+
+      service.on("test", function() {
+        return new bluebird.Promise(function(resolve, reject) {
+          return resolve(_data);
+        });
+      });
+
+      service.call("test", null, function(err, response) {
+        assert.ifError(err);
+        assert.deepEqual(response, _data);
+        done();
       });
 
     });
@@ -660,7 +679,7 @@ describe("Service", function() {
       let service = new Service();
 
       service.on("method1", s.Object({ opt: true }), function(data, callback) {
-        assert.deepEqual(data, null);
+        assert.deepEqual(data, undefined);
         return callback(null, _data);
       });
 

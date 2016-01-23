@@ -1,8 +1,9 @@
 
 "use strict";
 
-const async   = require("async");
-const s       = require("ht-schema");
+const async    = require("async");
+const s        = require("ht-schema");
+const bluebird = require("bluebird");
 
 const utils = require("./utils");
 
@@ -59,11 +60,7 @@ let Service = function Service(Transports, config) {
             let _tmp = this._methods[context.method];
             if(!_tmp) return cb({ error: "unknown-method", method: context.method });
 
-            let finish = (err, response) => {
-
-                if(err) {
-                    return cb(err);
-                }
+            let finish = (response) => {
 
                 let _afterMiddleware = this._middleware.after.filter((m) => {
                     if(m.method && m.method !== context.method) return false;
@@ -95,12 +92,28 @@ let Service = function Service(Transports, config) {
                             error: err.message
                         });
                     }
-                    return _tmp.fn(data, finish);
+                    return go();
                 });
             } else {
-                _tmp.fn(data, finish);
+                go();
             }
 
+            function go() {
+
+                // Handle both callbacks and promises here.
+                let callbackHandler = function(err, response) {
+                    if(err) return cb(err);
+                    return finish(response);
+                }
+
+                let response = _tmp.fn(data, callbackHandler);
+
+                if(response && typeof response.then === 'function') {
+                    callbackHandler = null;
+                    return response.then(finish).catch(cb);
+                }
+
+            }
 
         });
 
