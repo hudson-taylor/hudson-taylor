@@ -1,3 +1,12 @@
+Changelog 6.1.0:
+
+ * Allow returning promises from service functions.
+   Enables use of async/await.
+
+Changelog 6.0.7:
+
+ * Ensure HTTP client handles errors correctly
+
 Changelog 6.0.6:
 
  * Ensure HTTP client handles undefined response correctly
