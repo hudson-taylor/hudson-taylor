@@ -1,3 +1,7 @@
+Changelog 6.1.1:
+
+ * Return promise from Client#call if no callback is passed.
+
 Changelog 6.1.0:
 
  * Allow returning promises from service functions.
