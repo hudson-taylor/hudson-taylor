@@ -1,8 +1,9 @@
 
 "use strict";
 
-const assert = require("assert");
-const s      = require("ht-schema");
+const assert   = require("assert");
+const s        = require("ht-schema");
+const bluebird = require("bluebird");
 
 const Client = require("../lib/client");
 
@@ -292,6 +293,65 @@ describe("Client", function() {
             let client = new Client(services);
 
             client.call("s1", "method");
+
+        });
+
+        it("should return a promise if no callback is given", function(done) {
+
+            let services = {
+                "s1": mockTransport()()
+            };
+
+            let client = new Client(services);
+
+            let promise = client.call("s1", "method");
+
+            assert.equal(promise instanceof bluebird.Promise, true);
+
+            done();
+
+        });
+
+        it("should resolve promise correctly", function(done) {
+
+            let services = {
+                "s1": mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, _data);
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            let promise = client.call("s1", "method");
+
+            promise.then(function(response) {
+                assert.deepEqual(response, _data);
+                return done();
+            });
+
+        });
+
+
+        it("should reject promise correctly", function(done) {
+
+            let services = {
+                "s1": mockTransport({
+                    call(method, data, callback) {
+                        return callback(_data3);
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            let promise = client.call("s1", "method");
+
+            promise.catch(function(err) {
+                assert.deepEqual(err, _data3);
+                return done();
+            });
 
         });
 

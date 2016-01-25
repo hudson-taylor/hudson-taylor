@@ -1,9 +1,10 @@
 
 "use strict";
 
-const util   = require("util");
-const events = require("events");
-const async  = require("async");
+const util     = require("util");
+const events   = require("events");
+const async    = require("async");
+const bluebird = require("bluebird");
 
 const s = require("ht-schema");
 
@@ -94,15 +95,26 @@ Client.prototype.call = function(service, method, data, callback) {
         method
     };
 
+    let returnPromise = false;
+    let promise, resolve, reject;
+
     // this can be cleaned up
     if(!data && !callback) {
         data = undefined;
-        callback = function() {};
+        returnPromise = true;
     } else if(data && typeof data !== 'function' && !callback) {
-        callback = function() {};
+        returnPromise = true;
     } else if(typeof data === 'function') {
         callback = data;
         data = undefined;
+    }
+
+    if(returnPromise) {
+        // :(
+        promise = new bluebird.Promise(function(_resolve, _reject) {
+            resolve = _resolve;
+            reject  = _reject;
+        });
     }
 
     let _beforeMiddleware = this.middleware.before.filter((m) => {
@@ -110,6 +122,17 @@ Client.prototype.call = function(service, method, data, callback) {
         if(m.method  && m.method  !== context.method)  return false;
         return true;
     });
+
+    function returnResult(err, data) {
+        if(returnPromise) {
+            if(err) {
+                return reject(err);
+            } else {
+                return resolve(data);
+            }
+        }
+        return callback(err, data);
+    }
 
     async.eachSeries(_beforeMiddleware, function(middleware, done) {
         middleware.fn.call(context, data, function(err, result) {
@@ -121,18 +144,18 @@ Client.prototype.call = function(service, method, data, callback) {
         });
     }, (err) => {
         if(err) {
-            return callback(err);
+            return returnResult(err);
         }
 
         let conn = this.connections[context.service];
 
         if(!conn) {
-            return callback({ error: "unknown-service" });
+            return returnResult({ error: "unknown-service" });
         }
 
         conn.call(context.method, data, (err, data) => {
             if(err) {
-                return callback(err);
+                return returnResult(err);
             }
             let _afterMiddleware = this.middleware.after.filter((m) => {
                 if(m.service && m.service !== context.service) return false;
@@ -149,19 +172,19 @@ Client.prototype.call = function(service, method, data, callback) {
                 });
             }, (err) => {
                 if(err) {
-                    return callback(err);
+                    return returnResult(err);
                 }
 
                 let finish = (data) => {
                   this.emit("called", context.service, context.method);
-                  return callback(null, data);
+                  return returnResult(null, data);
                 }
 
                 if(this.schemas[context.service] && this.schemas[context.service][context.method]) {
                   let schema = this.schemas[context.service][context.method];
                   schema.validate(data, function(err, data) {
                     if(err) {
-                      return callback({
+                      return returnResult({
                         $htValidationError: true,
                         error: err.message
                       });
@@ -175,6 +198,10 @@ Client.prototype.call = function(service, method, data, callback) {
             });
         });
     });
+
+    if(returnPromise) {
+        return promise;
+    }
 
 };
 
