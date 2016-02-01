@@ -1,3 +1,7 @@
+Changelog 6.1.2:
+
+ * Clone data before passing to service function in client.
+
 Changelog 6.1.1:
 
  * Return promise from Client#call if no callback is passed.
