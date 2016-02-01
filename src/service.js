@@ -4,6 +4,7 @@
 const async    = require("async");
 const s        = require("ht-schema");
 const bluebird = require("bluebird");
+const clone    = require("clone");
 
 const utils = require("./utils");
 
@@ -34,6 +35,9 @@ let Service = function Service(Transports, config) {
     };
 
     this.fn = (method, data, cb) => {
+
+        // clone data
+        data = clone(data);
 
         let context = {
             method
