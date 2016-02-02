@@ -3,6 +3,8 @@
 
 const assert = require("assert");
 
+const s = require('ht-schema');
+
 const ht = require('../');
 
 const _data = { hello: 'world' };
@@ -66,6 +68,34 @@ describe("Regressions", function() {
 
         client.call('s', 'error', {}, function(err) {
             assert.equal(err.error, _errMsg);
+            done();
+        });
+
+    });
+
+    it("schema validation & manipulation should work", function(done) {
+
+        var transport = new ht.Transports.Local();
+
+        var service = new ht.Service(transport);
+
+        service.on("validate", s.Object({
+            string: s.String(),
+            defaults: s.Number({ default: 50 })
+        }), function(data, callback) {
+            return callback(null, data);
+        });
+
+        var client = new ht.Client({
+            s: transport
+        });
+
+        client.call('s', 'validate', {
+            string: 'hello world'
+        }, function(err, response) {
+            assert.ifError(err);
+            assert.equal(response.string, "hello world");
+            assert.equal(response.defaults, 50);
             done();
         });
 

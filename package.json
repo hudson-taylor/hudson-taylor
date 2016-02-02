@@ -51,6 +51,7 @@
   "devDependencies": {
     "babel": "~5.8.20",
     "coveralls": "~2.11.3",
+    "ht-schema": "^3.1.4",
     "istanbul": "~0.4.0",
     "mocha": "~2.3.3",
     "openport": "~0.0.4",

@@ -96,13 +96,13 @@ let Service = function Service(Transports, config) {
                             error: err.message
                         });
                     }
-                    return go();
+                    return go(data);
                 });
             } else {
-                go();
+                go(data);
             }
 
-            function go() {
+            function go(data) {
 
                 // Handle both callbacks and promises here.
                 let callbackHandler = function(err, response) {

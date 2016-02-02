@@ -679,7 +679,7 @@ describe("Service", function() {
       let service = new Service();
 
       service.on("method1", s.Object({ opt: true }), function(data, callback) {
-        assert.deepEqual(data, undefined);
+        assert.deepEqual(data, null);
         return callback(null, _data);
       });
 
