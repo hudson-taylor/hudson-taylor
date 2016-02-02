@@ -1,3 +1,8 @@
+Changelog 6.1.3:
+
+ * Switching to use promises in 6.1.0 broke schema manipulation.
+   This version makes it all work again :)
+
 Changelog 6.1.2:
 
  * Clone data before passing to service function in client.
