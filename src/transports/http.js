@@ -17,13 +17,21 @@ function HTTPTransportServer(config) {
 
     let _HTTPTransportServer = function(fn) {
         this.config = config;
+
+        // Allow the user to pass in their own express
+        // application. This lets you have multiple
+        // services listen on the same port, by passing
+        // custom "path" config options to the transport.
+        if(this.config.app !== undefined) {
+            this.customApp = true;
+        }
         // An instance of _HTTPTransportServer is created
         // when this transport is passed into ht.Service.
         // Here, we can setup services that need to persist,
         // like the express server here. A function is
         // passed as an argument, you need to call this 
         // when you receive a request. See below.
-        let eApp = express();
+        let eApp = this.config.app || express();
         eApp.use(bodyParser.json());
         eApp.post(this.config.path, function(req, res) {
             // We got a request from a client, call function
@@ -55,6 +63,7 @@ function HTTPTransportServer(config) {
         // multiple times, so be sure to track if things
         // are listening or not.
         if(this.listening) return done();
+        if(this.customApp) return done();
         this.app.listen(this.config.port, this.config.host, () => {
             this.listening = true;
             done();
@@ -66,6 +75,7 @@ function HTTPTransportServer(config) {
         // when the user called .stop on the parent Service
         // object. It can also be called multiple times.
         if(!this.listening) return done();
+        if(this.customApp) return done();
         this.app.close(() => {
           this.listening = false;
           done();
@@ -160,7 +170,7 @@ function HTTPTransport(config) {
     // This parent instance should return both Server and Client.
     // You can also setup things that both Server & Client need
     // access to here, configuration, FDs etc.
-    if(!config || typeof config !== 'object' || !config.host || !config.port)
+    if(!config || typeof config !== 'object' || (!config.app && (!config.host || !config.port)))
       throw new Error("You must pass a configuration object to the HTTP Transport.");
     if(config.path === undefined) config.path = "/ht";
     if(config.ssl === undefined) config.ssl = false;

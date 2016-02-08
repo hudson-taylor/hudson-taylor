@@ -88,6 +88,16 @@ describe("HTTP Transport", function() {
 
 		});
 
+		it("should not rquire host & port when app is passed in", function() {
+
+			let app = express();
+
+			let transport = HTTP({ app });
+
+			assert.equal(transport instanceof HTTP, true);
+
+		});
+
 	});
 
 	describe("Server", function() {
@@ -273,6 +283,79 @@ describe("HTTP Transport", function() {
 				});
 
 			});
+
+		});
+
+		it("should let multiple services listen on the same port using app", function(done) {
+
+			let app = express();
+
+			let transport1 = new HTTP({ app, path: '/one' });
+			let transport2 = new HTTP({ app, path: '/two' });
+
+			let server1 = new transport1.Server(function(method, data, callback) {
+				assert.equal(method, 'method1');
+				return callback(null, data);
+			});
+
+			let server2 = new transport2.Server(function(method, data, callback) {
+				assert.equal(method, 'method2');
+				return callback(null, data);
+			});
+
+			let server = app.listen(port, host, function(err) {
+				assert.ifError(err);
+
+				request({
+					url:    "http://" + host + ":" + port + "/one",
+					method: "POST",
+					json:   { method: "method1", args: "method 1" }
+				}, function(e, r, body) {
+					assert.ifError(e);
+					assert.deepEqual(body, "method 1");
+
+					request({
+						url:    "http://" + host + ":" + port + "/two",
+						method: "POST",
+						json:   { method: "method2", args: "method 2" }
+					}, function(e, r, body) {
+						assert.ifError(e);
+						assert.deepEqual(body, "method 2");
+
+						server.close(done);
+
+					});
+
+				});
+
+			});
+
+		});
+
+		it("should noop listen if custom app is passed", function(done) {
+
+			let app = express();
+
+			let transport = HTTP({ app });
+
+			let server = new transport.Server();
+
+			server.listen(done);
+
+		});
+
+		it("should noop stop if custom app is passed", function(done) {
+
+			let app = express();
+
+			let transport = HTTP({ app });
+
+			let server = new transport.Server();
+
+			// Make sure server thinks it's listening
+			server.listening = true;
+
+			server.stop(done);
 
 		});
 
