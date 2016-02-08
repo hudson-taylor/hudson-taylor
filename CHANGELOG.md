@@ -1,3 +1,9 @@
+Changelog 6.2.0:
+
+ * Allows passing an existing HTTP server instance
+   to the HTTP transport, allowing multiple services
+   to listen on the same port, but different path.
+
 Changelog 6.1.3:
 
  * Switching to use promises in 6.1.0 broke schema manipulation.
