@@ -45,8 +45,9 @@
     "bluebird": "^3.1.1",
     "body-parser": "~1.15.0",
     "clone": "^1.0.2",
+    "cors": "^2.7.1",
     "express": "~4.13.2",
-    "ht-schema": "~3.1.4"
+    "ht-schema": "^3.2.0"
   },
   "devDependencies": {
     "babel": "~6.5.2",
@@ -54,11 +55,13 @@
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-preset-es2015": "^6.5.0",
     "coveralls": "~2.11.3",
-    "ht-schema": "^3.1.4",
     "istanbul": "~0.4.0",
     "mocha": "~2.4.5",
     "openport": "~0.0.4",
     "request": "~2.69.0",
     "supertest": "~1.2.0"
+  },
+  "browser": {
+    "express": false
   }
 }

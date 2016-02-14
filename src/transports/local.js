@@ -1,9 +1,7 @@
 
 "use strict";
 
-var path = require("path");
-
-var utils = require(path.resolve(__dirname, "../utils"));
+var utils = require("../utils");
 
 var formatError = utils.formatError;
 
