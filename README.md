@@ -17,10 +17,6 @@ added benefit of being able to automatically generate documentation for these me
 
 See [Changelog here](CHANGELOG.md)
 
-### Todos
-
- * Automatic documentation generation still WIP
-
 # Documentation
 
 Please visit [https://hudson-taylor.github.io](https://hudson-taylor.github.io)
