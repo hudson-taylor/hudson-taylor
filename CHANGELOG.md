@@ -1,3 +1,8 @@
+Changelog 6.3.0:
+
+ * Modify code to add support for browserify.
+ * Bump ht-schema so it can be browserified too.
+
 Changelog 6.2.0:
 
  * Allows passing an existing HTTP server instance
