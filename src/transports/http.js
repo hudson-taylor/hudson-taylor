@@ -7,11 +7,11 @@
 
 const http       = require("http");
 const https      = require("https");
-const path       = require("path");
 const express    = require("express");
 const bodyParser = require("body-parser");
+const cors       = require("cors");
 
-const utils = require(path.resolve(__dirname, "../utils"));
+const utils = require("../utils");
 
 function HTTPTransportServer(config) {
 
@@ -33,6 +33,11 @@ function HTTPTransportServer(config) {
         // when you receive a request. See below.
         let eApp = this.config.app || express();
         eApp.use(bodyParser.json());
+        // Check if we need to respond with CORS headers
+        // Needed if you want to use HT in the browser.
+        if(this.config.cors !== undefined && !this.customApp) {
+            eApp.use(cors());
+        }
         eApp.post(this.config.path, function(req, res) {
             // We got a request from a client, call function
             // provided, passing the method name as first argument, 

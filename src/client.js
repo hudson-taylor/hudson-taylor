@@ -6,8 +6,6 @@ const events   = require("events");
 const async    = require("async");
 const bluebird = require("bluebird");
 
-const s = require("ht-schema");
-
 const utils = require("./utils");
 
 let Client = function Client(services) {
