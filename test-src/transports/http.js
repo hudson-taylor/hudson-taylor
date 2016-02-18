@@ -433,11 +433,13 @@ describe("HTTP Transport", function() {
 
 			let client = new transport.Client();
 
-			client.url = "http://127.0.0.1:1/";
+			client.config.port = 2000;
 
 			client.call("", {}, function(err) {
 
-				assert.equal(err.errno, "ECONNREFUSED");
+				assert.equal(err.substr(0, 20), "connect ECONNREFUSED");
+
+				client.config.port = port;
 
 				done();
 
@@ -480,19 +482,21 @@ describe("HTTP Transport", function() {
 
 		});
 
-		it("should return error if response is not valid JSON", function(done) {
+		it("should return response even if response is not valid JSON", function(done) {
+
+			let str = 'hello';
 
 			let app = express();
 			app.use(bodyParser.json());
 			app.post("/ht", function(req, res) {
-				res.end('hello');
+				res.end(str);
 			});
 
 			let client = new transport.Client();
 
 			let _server = app.listen(port, host, function() {
 				client.call('a', 'b', function(err) {
-					assert.equal(err.toString(), "SyntaxError: Unexpected token h");
+					assert.equal(err, str);
 					_server.close(done);
 				});
 			});

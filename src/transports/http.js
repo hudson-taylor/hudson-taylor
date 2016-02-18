@@ -146,17 +146,18 @@ function HTTPTransportClient(config) {
               }
               var parsedJSON = JSON.parse(response);
               if(parsedJSON.$htTransportError) {
-                return callback(parsedJSON.$htTransportError)
+                return callback(parsedJSON.$htTransportError);
               }
               return callback(null, parsedJSON);
             } catch(e) {
-              return callback(e);
+              // Return response here anyway
+              return callback(utils.formatError(response).error);
             }
           });
         });
 
         req.on('error', function(err) {
-          return callback(err);
+          return callback(utils.formatError(err).error);
         });
 
         req.write(json);
