@@ -6,7 +6,7 @@ const net    = require("net");
 
 const openport = require("openport");
 
-const TCP = require("../../lib/transports/tcp");
+const TCP = require("../../src/transports/tcp");
 
 describe("TCP Transport", function() {
 
