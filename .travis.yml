@@ -1,9 +1,12 @@
 language: node_js
 node_js:
-  - "0.10"
-  - "0.12"
-  - "5"
-script: "npm run coverage"
-after_success: "npm run push-coverage"
+- '0.10'
+- '0.12'
+- '4'
+- '5'
+script: npm run coverage
+after_success: npm run push-coverage
 notifications:
-  irc: "chat.freenode.net#htjs"
+  irc: chat.freenode.net#htjs
+  slack:
+    secure: HInDK+GS7OtRybu7vfOckRNFss8qSDT6mmEdE6Sy1VzJfGfM2hdhutFj3m1m/DKfab/C5WyPvG/mb+azScGecLlUvOsYtIVE27ZmtFekFLna+ygCv9q9Hm1JsH1m+VplIO2CQlKJ+Cjfvp4jbSH7zVcDqhgO8FHd+alUrTldpIk=
