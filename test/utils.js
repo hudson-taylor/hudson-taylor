@@ -7,10 +7,10 @@ const express    = require("express");
 const bodyParser = require("body-parser");
 const supertest  = require("supertest");
 
-const Service    = require("../lib/service");
-const Client     = require("../lib/client");
-const Transports = require("../lib/transports");
-const utils      = require("../lib/utils");
+const Service    = require("../src/service");
+const Client     = require("../src/client");
+const Transports = require("../src/transports");
+const utils      = require("../src/utils");
 const s          = require("ht-schema");
 
 describe("Utilities", function() {

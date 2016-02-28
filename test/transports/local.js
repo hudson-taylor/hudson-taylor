@@ -3,7 +3,7 @@
 
 const assert = require("assert");
 
-const LOCAL = require("../../lib/transports/local");
+const LOCAL = require("../../src/transports/local");
 
 describe("Local Transport", function() {
 

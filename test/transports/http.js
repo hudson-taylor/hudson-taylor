@@ -10,7 +10,7 @@ const request    = require("request");
 const express    = require("express");
 const bodyParser = require("body-parser");
 
-const HTTP = require("../../lib/transports/http");
+const HTTP = require("../../src/transports/http");
 
 const SSLKeys = require("../fixtures/sslkeys");
 

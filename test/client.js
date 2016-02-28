@@ -5,7 +5,7 @@ const assert   = require("assert");
 const s        = require("ht-schema");
 const bluebird = require("bluebird");
 
-const Client = require("../lib/client");
+const Client = require("../src/client");
 
 const _data = {
     hello: "world"

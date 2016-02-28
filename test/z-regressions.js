@@ -5,7 +5,11 @@ const assert = require("assert");
 
 const s = require('ht-schema');
 
-const ht = require('../');
+let ht = {};
+
+ht.Service    = require('../src/service');
+ht.Client     = require('../src/client');
+ht.Transports = require('../src/transports');
 
 const _data = { hello: 'world' };
 
