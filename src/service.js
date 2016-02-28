@@ -131,6 +131,28 @@ let Service = function Service(Transports, config) {
         utils.getLastResult.call(this, data, callback, true);
     });
 
+    this.on("$htGetSchema", s.String(), (methodName, callback) => {
+        let method = this._methods[methodName];
+        if(!method) {
+            return callback({
+                error:  "unknown-method",
+                method: methodName
+            });
+        }
+        let schema = method.schema;
+        if(!schema) {
+            return callback();
+        }
+        // We allow non ht-schema validation schemas
+        // too, so make sure it has a document fn
+        if(typeof schema.document !== 'function') {
+            return callback({
+                error: "incompatible-schema"
+            });
+        }
+        return callback(null, schema.document());
+    });
+
     Transports.forEach((transport) => {
         this.addTransport(transport);
     });

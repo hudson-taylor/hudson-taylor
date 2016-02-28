@@ -722,6 +722,86 @@ describe("Service", function() {
 
   });
 
+  describe("$htGetSchema", function() {
+
+    it("should return unknown-method if called with unknown method", function(done) {
+
+      let service = new Service();
+      let _method = "hello-world";
+
+      service.call("$htGetSchema", _method, function(err) {
+        assert.equal(err.error, "unknown-method");
+        assert.equal(err.method, _method);
+        done();
+      });
+
+    });
+
+    it("should return nothing if method has no schema", function(done) {
+
+      let service = new Service();
+      let _method = "hello-world";
+
+      service.on(_method, function(data, callback) { 
+        return callback(null, data);
+      });
+
+      service.call("$htGetSchema", _method, function(err, response) {
+        assert.ifError(err);
+        assert.strictEqual(response, undefined);
+        done();
+      });
+
+    });
+
+    it("should return incompatible-schema if called with a schema with no document fn", function(done) {
+
+      let service = new Service();
+      let _method = "hello-world";
+
+      let schema = {
+        validate: function(data, callback) {
+          return callback(null, data);
+        }
+      }
+
+      service.on(_method, schema, function(data, callback) {
+        return callback(null, data);
+      });
+
+      service.call("$htGetSchema", _method, function(err) {
+        assert.equal(err.error, "incompatible-schema");
+        done();
+      });
+
+    });
+
+    it("should return schema if called with known method", function(done) {
+
+      let service = new Service();
+      let _method = "hello-world";
+
+      let schema = s.Object({
+        string: s.String(),
+        number: s.Number(),
+        array:  s.Array([ s.String(), s.Number() ]),
+        opt:    s.String({ opt: true })
+      });
+
+      service.on(_method, schema, function(data, callback) {
+        return callback(null, data);
+      });
+
+      service.call("$htGetSchema", _method, function(err, _schema) {
+        assert.ifError(err);
+        assert.deepEqual(_schema, schema.document());
+        done();
+      });
+
+    });
+
+  });
+
 });
 
 function mockTransport(fns) {
