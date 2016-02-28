@@ -60,7 +60,7 @@ describe("Client", function() {
 
         });
 
-        it("should not require new keyword for creation", function() {
+        xit("should not require new keyword for creation", function() {
 
             let client = Client();
 
