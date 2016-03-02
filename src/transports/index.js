@@ -1,6 +1,7 @@
 
 "use strict";
 
-exports.HTTP  = require('./http');
-exports.TCP   = require('./tcp');
 exports.Local = require('./local');
+
+exports.HTTP = require('ht-http-transport');
+exports.TCP = require('ht-tcp-transport');

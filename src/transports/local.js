@@ -1,7 +1,7 @@
 
 "use strict";
 
-var utils = require("../utils");
+var utils = require("ht-utils");
 
 var formatError = utils.formatError;
 
