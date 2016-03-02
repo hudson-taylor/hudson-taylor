@@ -4,6 +4,7 @@
 const assert   = require("assert");
 const s        = require("ht-schema");
 const bluebird = require("bluebird");
+const httv4    = require("ht-tv4");
 
 const Client = require("../src/client");
 
@@ -933,11 +934,11 @@ describe("Client", function() {
 
             client.addSchema("hello", "hi", s.String());
 
-            assert.equal(Object.keys(client.schemas.hello).length, 1);
+            assert.equal(Object.keys(client.responseSchemas.hello).length, 1);
 
             client.addSchema("hello", "hi2", s.String());
 
-            assert.equal(Object.keys(client.schemas.hello).length, 2);
+            assert.equal(Object.keys(client.responseSchemas.hello).length, 2);
 
         });
 
@@ -1012,6 +1013,83 @@ describe("Client", function() {
 
             assert.throws(function() {
                 client.addSchema("s1", "method", true);
+            });
+
+        });
+
+    });
+
+    describe("fetchSchemas", function() {
+
+        it("should add schemas to local cache", function(done) {
+
+            let schema1 = s.String();
+            let schema2 = s.Boolean({ opt: true });
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, {
+                            method1: schema1.document(),
+                            method2: schema2.document()
+                        });
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            assert.equal(client.requestSchemas.s1, undefined);
+
+            client.fetchSchemas(function(err) {
+                assert.ifError(err);
+
+                assert.notEqual(client.requestSchemas.s1.method1, undefined);
+                assert.notEqual(client.requestSchemas.s1.method2, undefined);
+
+                done();
+            });
+
+        });
+
+        it("should allow fetching custom non ht-schema schemas", function(done) {
+
+            let _schema = {
+                input: {
+                    type: "string"
+                }
+            }
+
+            let schema = httv4(_schema);
+
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        return callback(null, {
+                            method1: schema.document()
+                        });
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            assert.equal(client.requestSchemas.s1, undefined);
+
+            client.fetchSchemas({
+                s1: httv4
+            }, function(err) {
+                assert.ifError(err);
+                assert.notEqual(client.requestSchemas.s1.method1, undefined);
+                client.requestSchemas.s1.method1.validate({
+                    input: "blah"
+                }, function(err, response) {
+                    assert.ifError(err);
+                    assert.deepEqual(response, {
+                        input: "blah"
+                    });
+                    return done();
+                });
             });
 
         });

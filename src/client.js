@@ -6,6 +6,7 @@ const events   = require("events");
 const async    = require("async");
 const bluebird = require("bluebird");
 const utils    = require("ht-utils");
+const s        = require("ht-schema");
 
 let Client = function Client(services) {
 
@@ -13,9 +14,10 @@ let Client = function Client(services) {
         return new Client(services);
     }
 
-    this.services    = {};
-    this.connections = {};
-    this.schemas     = {};
+    this.services        = {};
+    this.connections     = {};
+    this.requestSchemas  = {};
+    this.responseSchemas = {};
 
     this.middleware  = {
         before: [],
@@ -42,13 +44,13 @@ Client.prototype.add = function(name, transport) {
 };
 
 Client.prototype.addSchema = function(service, method, schema) {
-  if(!this.schemas[service]) {
-    this.schemas[service] = {};
+  if(!this.responseSchemas[service]) {
+    this.responseSchemas[service] = {};
   }
   if(typeof schema.validate !== 'function') {
     throw new Error("Schema for " + method + " does not have a validate function.");
   }
-  this.schemas[service][method] = schema;
+  this.responseSchemas[service][method] = schema;
 }
 
 Client.prototype.connect = function(done) {
@@ -177,8 +179,8 @@ Client.prototype.call = function(service, method, data, callback) {
                   return returnResult(null, data);
                 }
 
-                if(this.schemas[context.service] && this.schemas[context.service][context.method]) {
-                  let schema = this.schemas[context.service][context.method];
+                if(this.responseSchemas[context.service] && this.responseSchemas[context.service][context.method]) {
+                  let schema = this.responseSchemas[context.service][context.method];
                   schema.validate(data, function(err, data) {
                     if(err) {
                       return returnResult({
@@ -308,6 +310,43 @@ Client.prototype.end = function(callback) {
     });
 
     utils.getLastResult.call(this, methods, callback);
+
+}
+
+Client.prototype.fetchSchemas = function(schemaTypeMap = {}, callback = () => {}) {
+
+  if(typeof schemaTypeMap == 'function') {
+    callback = schemaTypeMap;
+    schemaTypeMap = {};
+  }
+
+  async.each(Object.keys(this.services), (service, done) => {
+
+    let conn = this.connections[service];
+
+    conn.call("$htGetAllSchemas", null, (err, schemas) => {
+
+      if(err) {
+        return done(err);
+      }
+
+      let schemaType = schemaTypeMap[service] || s;
+
+      for(let method in schemas) {
+
+        if(!this.requestSchemas[service]) {
+          this.requestSchemas[service] = {};
+        }
+
+        this.requestSchemas[service][method] = schemaType.generate(schemas[method]);
+
+      }
+
+      done();
+
+    });
+
+  }, callback);
 
 }
 
