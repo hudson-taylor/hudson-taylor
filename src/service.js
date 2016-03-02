@@ -23,6 +23,12 @@ let Service = function Service(Transports, config) {
         config = {};
     }
 
+    const privateMethods = [
+      '$htMultiCall',
+      '$htGetSchema',
+      '$htGetAllSchemas'
+    ];
+
     this.config      = config;
     this._methods    = {};
     this._servers    = [];
@@ -151,6 +157,24 @@ let Service = function Service(Transports, config) {
             });
         }
         return callback(null, schema.document());
+    });
+
+    this.on("$htGetAllSchemas", (data, callback) => {
+      let schemas = {};
+      async.each(Object.keys(this._methods), (method, done) => {
+        if(~privateMethods.indexOf(method)) return done();
+        this.call("$htGetSchema", method, function(err, schema) {
+          if(err) {
+            // don't err, just keep
+            // fetching schemas
+            return done();
+          }
+          schemas[method] = schema;
+          return done();
+        })
+      }, function() {
+        return callback(null, schemas);
+      });
     });
 
     Transports.forEach((transport) => {

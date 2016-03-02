@@ -802,6 +802,73 @@ describe("Service", function() {
 
   });
 
+  describe("$htGetAllSchemas", function() {
+
+    it("should return schemas for all methods on service", function(done) {
+
+      function noop() {};
+
+      let service = new Service();
+
+      let schema1 = s.Object({
+        s1: s.String()
+      });
+
+      let schema2 = s.Object({
+        s2: s.Object({ opt: true }, {
+          key: s.Object({
+            value: s.Boolean({ default: true, opt: true })
+          })
+        })
+      });
+
+      service.on("method1", schema1, noop);
+      service.on("method2", schema2, noop);
+
+      service.call("$htGetAllSchemas", null, function(err, schemas) {
+        assert.ifError(err);
+
+        assert.deepEqual(schemas, {
+          method1: schema1.document(),
+          method2: schema2.document()
+        });
+
+        done();
+      });
+
+    });
+
+    it("should skip schema if it has incompatible schema type", function(done) {
+
+      function noop() {};
+
+      let service = new Service();
+
+      let schema1 = {
+        validate: function(data, callback) {
+          return callback(null, data);
+        }
+      }
+
+      let schema2 = s.String({ opt: true });
+
+      service.on("method1", schema1, noop);
+      service.on("method2", schema2, noop);
+
+      service.call("$htGetAllSchemas", null, function(err, schemas) {
+        assert.ifError(err);
+
+        assert.deepEqual(schemas, {
+          method2: schema2.document()
+        });
+
+        done();
+      });
+
+    });
+
+  });
+
 });
 
 function mockTransport(fns) {
