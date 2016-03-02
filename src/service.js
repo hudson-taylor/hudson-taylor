@@ -5,8 +5,7 @@ const async    = require("async");
 const s        = require("ht-schema");
 const bluebird = require("bluebird");
 const clone    = require("clone");
-
-const utils = require("./utils");
+const utils    = require("ht-utils");
 
 let Service = function Service(Transports, config) {
 

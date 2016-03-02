@@ -43,11 +43,11 @@
   "dependencies": {
     "async": "~1.5.2",
     "bluebird": "^3.1.1",
-    "body-parser": "~1.15.0",
     "clone": "^1.0.2",
-    "cors": "^2.7.1",
-    "express": "~4.13.2",
-    "ht-schema": "^3.2.0"
+    "ht-http-transport": "^1.0.0",
+    "ht-schema": "^3.2.0",
+    "ht-tcp-transport": "^1.0.0",
+    "ht-utils": "^1.0.0"
   },
   "devDependencies": {
     "babel": "~6.5.2",
@@ -58,10 +58,7 @@
     "coveralls": "~2.11.3",
     "istanbul": "~0.4.0",
     "mocha": "~2.4.5",
-    "nyc": "^5.6.0",
-    "openport": "~0.0.4",
-    "request": "~2.69.0",
-    "supertest": "~1.2.0"
+    "nyc": "^5.6.0"
   },
   "browser": {
     "express": false
