@@ -53,6 +53,16 @@ Client.prototype.addSchema = function(service, method, schema) {
   this.responseSchemas[service][method] = schema;
 }
 
+Client.prototype.addRequestSchema = function(service, method, schema) {
+  if(!this.requestSchemas[service]) {
+    this.requestSchemas[service] = {};
+  }
+  if(typeof schema.validate !== 'function') {
+    throw new Error("Schema for " + method + " does not have a validate function.");
+  }
+  this.requestSchemas[service][method] = schema;
+}
+
 Client.prototype.connect = function(done) {
 
     async.each(Object.keys(this.services), (name, cb) => {
@@ -116,12 +126,6 @@ Client.prototype.call = function(service, method, data, callback) {
         });
     }
 
-    let _beforeMiddleware = this.middleware.before.filter((m) => {
-        if(m.service && m.service !== context.service) return false;
-        if(m.method  && m.method  !== context.method)  return false;
-        return true;
-    });
-
     function returnResult(err, data) {
         if(returnPromise) {
             if(err) {
@@ -133,70 +137,103 @@ Client.prototype.call = function(service, method, data, callback) {
         return callback(err, data);
     }
 
-    async.eachSeries(_beforeMiddleware, function(middleware, done) {
-        middleware.fn.call(context, data, function(err, result) {
+    if(data && this.requestSchemas[service]) {
+
+        let schema = this.requestSchemas[service][method];
+
+        if(!schema) {
+            return doCall.call(this);
+        }
+
+        schema.validate(data, (err, data) => {
             if(err) {
-                return done(err);
+                return returnResult({
+                  $htValidationError: true,
+                  $htValidationLocal: true,
+                  error: err.message
+                });
             }
-            data = result;
-            done();
+            doCall.call(this);
         });
-    }, (err) => {
-        if(err) {
-            return returnResult(err);
-        }
 
-        let conn = this.connections[context.service];
+    } else {
+        doCall.call(this);
+    }
 
-        if(!conn) {
-            return returnResult({ error: "unknown-service" });
-        }
+    function doCall() {
 
-        conn.call(context.method, data, (err, data) => {
+        let _beforeMiddleware = this.middleware.before.filter((m) => {
+            if(m.service && m.service !== context.service) return false;
+            if(m.method  && m.method  !== context.method)  return false;
+            return true;
+        });
+
+        async.eachSeries(_beforeMiddleware, function(middleware, done) {
+            middleware.fn.call(context, data, function(err, result) {
+                if(err) {
+                    return done(err);
+                }
+                data = result;
+                done();
+            });
+        }, (err) => {
             if(err) {
                 return returnResult(err);
             }
-            let _afterMiddleware = this.middleware.after.filter((m) => {
-                if(m.service && m.service !== context.service) return false;
-                if(m.method  && m.method  !== context.method)  return false;
-                return true;
-            });
-            async.eachSeries(_afterMiddleware, function(middleware, done) {
-                middleware.fn.call(context, data, function(err, result) {
-                    if(err) {
-                        return done(err);
-                    }
-                    data = result;
-                    done();
-                });
-            }, (err) => {
+
+            let conn = this.connections[context.service];
+
+            if(!conn) {
+                return returnResult({ error: "unknown-service" });
+            }
+
+            conn.call(context.method, data, (err, data) => {
                 if(err) {
                     return returnResult(err);
                 }
-
-                let finish = (data) => {
-                  this.emit("called", context.service, context.method);
-                  return returnResult(null, data);
-                }
-
-                if(this.responseSchemas[context.service] && this.responseSchemas[context.service][context.method]) {
-                  let schema = this.responseSchemas[context.service][context.method];
-                  schema.validate(data, function(err, data) {
+                let _afterMiddleware = this.middleware.after.filter((m) => {
+                    if(m.service && m.service !== context.service) return false;
+                    if(m.method  && m.method  !== context.method)  return false;
+                    return true;
+                });
+                async.eachSeries(_afterMiddleware, function(middleware, done) {
+                    middleware.fn.call(context, data, function(err, result) {
+                        if(err) {
+                            return done(err);
+                        }
+                        data = result;
+                        done();
+                    });
+                }, (err) => {
                     if(err) {
-                      return returnResult({
-                        $htValidationError: true,
-                        error: err.message
-                      });
+                        return returnResult(err);
                     }
-                    return finish(data);
-                  });
-                } else {
-                  return finish(data);
-                }
 
+                    let finish = (data) => {
+                      this.emit("called", context.service, context.method);
+                      return returnResult(null, data);
+                    }
+
+                    if(this.responseSchemas[context.service] && this.responseSchemas[context.service][context.method]) {
+                      let schema = this.responseSchemas[context.service][context.method];
+                      schema.validate(data, function(err, data) {
+                        if(err) {
+                          return returnResult({
+                            $htValidationError: true,
+                            error: err.message
+                          });
+                        }
+                        return finish(data);
+                      });
+                    } else {
+                      return finish(data);
+                    }
+
+                });
             });
         });
-    });
+
+    }
 
     if(returnPromise) {
         return promise;
@@ -338,7 +375,7 @@ Client.prototype.fetchSchemas = function(schemaTypeMap = {}, callback = () => {}
           this.requestSchemas[service] = {};
         }
 
-        this.requestSchemas[service][method] = schemaType.generate(schemas[method]);
+        this.addRequestSchema(service, method, schemaType.generate(schemas[method]));
 
       }
 

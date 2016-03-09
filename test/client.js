@@ -926,7 +926,53 @@ describe("Client", function() {
 
     });
 
-    describe("schemas", function() {
+    describe("Request Schemas", function() {
+
+        describe("addRequestSchema", function() {
+
+            it("should add a schema", function() {
+
+                let client = new Client();
+
+                client.addRequestSchema("hello", "world", s.String());
+
+                assert.equal(typeof client.requestSchemas.hello.world.validate, 'function');
+
+            });
+
+            it("should add multiple schemas", function() {
+
+                let client = new Client();
+
+                client.addRequestSchema("helloworld", "str", s.String());
+                client.addRequestSchema("helloworld", "num", s.Number());
+                client.addRequestSchema("blah", "foo", s.Date());
+
+                assert.equal(typeof client.requestSchemas.helloworld.str.validate, 'function');
+                assert.equal(typeof client.requestSchemas.helloworld.num.validate, 'function');
+                assert.equal(typeof client.requestSchemas.blah.foo.validate, 'function');
+
+            });
+
+            it("should throw if schema doesn't have validate fn", function() {
+
+                let client = new Client();
+
+                let schema = {};
+
+                let _method = "blah";
+
+                assert.throws(function() {
+                    client.addRequestSchema("foo", _method, schema);
+                }, new RegExp(`Schema for ${_method} does not have a validate function.`));
+
+            });
+
+        });
+
+    });
+
+    describe("Response Schemas", function() {
 
         it("should be able to add schemas", function() {
 
@@ -1080,7 +1126,7 @@ describe("Client", function() {
                 s1: httv4
             }, function(err) {
                 assert.ifError(err);
-                assert.notEqual(client.requestSchemas.s1.method1, undefined);
+                assert.equal(typeof client.requestSchemas.s1.method1.validate, 'function');
                 client.requestSchemas.s1.method1.validate({
                     input: "blah"
                 }, function(err, response) {
