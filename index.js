@@ -1,8 +1,8 @@
 
-"use strict";
+'use strict'
 
-exports.Client     = require('./lib/client');
-exports.Service    = require('./lib/service');
-exports.Transports = require('./lib/transports');
+exports.Client = require('./lib/client')
+exports.Service = require('./lib/service')
+exports.Transports = require('./lib/transports')
 
-exports.utils = require('ht-utils');
+exports.utils = require('ht-utils')
