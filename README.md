@@ -3,6 +3,7 @@ hudson-taylor
 
 [![Build Status](https://travis-ci.org/hudson-taylor/hudson-taylor.svg?branch=master)](https://travis-ci.org/hudson-taylor/hudson-taylor)
 [![Coverage Status](https://img.shields.io/coveralls/hudson-taylor/hudson-taylor/master.svg)](https://coveralls.io/r/hudson-taylor/hudson-taylor?branch=master)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 Hudson Taylor is a set of libraries for building automatically
 documented, well validated services.
