@@ -117,7 +117,9 @@ let Service = function Service (Transports, config) {
 
         if (response && typeof response.then === 'function') {
           callbackHandler = null
-          return response.then(finish).catch(cb)
+          return response.then(finish, cb)
+          // if an exception was thrown from finish(), let it bubble up
+          // as an unhandled rejection, rather than also call cb()
         }
       }
     })
