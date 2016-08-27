@@ -108,6 +108,8 @@ let Service = function Service (Transports, config) {
 
       function go (data) {
         // Handle both callbacks and promises here.
+        // It is expected that the CALLER only calls the callback OR
+        // returns a promise. If they do both, there will be two callbacks
         let callbackHandler = function (err, response) {
           if (err) return cb(err)
           return finish(response)
@@ -116,8 +118,9 @@ let Service = function Service (Transports, config) {
         let response = _tmp.fn(data, callbackHandler)
 
         if (response && typeof response.then === 'function') {
-          callbackHandler = null
-          return response.then(finish).catch(cb)
+          return response.then(finish, cb)
+          // if an exception was thrown from finish(), let it bubble up
+          // as an unhandled rejection, rather than also call cb()
         }
       }
     })
