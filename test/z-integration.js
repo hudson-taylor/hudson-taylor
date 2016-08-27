@@ -18,7 +18,7 @@ describe("Integrations", function () {
     let countCalled = 0
 
     service.on("hello", null, function () {
-      return new Promise(function (resolve, reject) { 
+      return new bluebird.Promise(function (resolve, reject) {
         resolve('hello')
       })
     })
