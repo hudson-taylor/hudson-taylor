@@ -11,9 +11,9 @@ const Transports = require('../src/transports');
 
 describe("Integrations", function () {
   it("does not double call when callback throws", function (done) {
-    var transport = new Transports.Local();
-    var service = new Service(transport);
-    var client = new Client({ s: transport });
+    const transport = new Transports.Local();
+    const service = new Service(transport);
+    const client = new Client({ s: transport });
 
     let countCalled = 0
 
@@ -32,7 +32,7 @@ describe("Integrations", function () {
       switch (countCalled) {
         case 0: throw Error('did not get called at all')
         case 1: return done()
-        case 2: throw Error('called multiple times')
+        default: throw Error('called multiple times')
       }
     }, 100)
   });
