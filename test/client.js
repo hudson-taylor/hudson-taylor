@@ -780,6 +780,27 @@ describe("Client", function() {
                 return done()
             })
         });
+
+        it('prepared function should return promise when called', function (done) {
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        assert.deepEqual(data, _data)
+                        return callback(null, _data2)
+                    }
+                })()
+            }
+            let client = new Client(services)
+            let prepared = client.prepare('s1', 'method')
+            let promise = prepared(_data)
+            assert(promise instanceof bluebird.Promise)
+            promise.then(function (result) {
+                assert.deepEqual(result, _data2)
+                return done()
+            }).catch(function (err) {
+                assert.ifError(err)
+            })
+        })
     });
 
     describe("chain", function() {

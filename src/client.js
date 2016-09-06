@@ -217,7 +217,7 @@ Client.prototype.prepare = function (service, method, data) {
     if (typeof _data === 'undefined') {
       _data = data
     }
-    this.call(service, method, _data, callback)
+    return this.call(service, method, _data, callback)
   }
 }
 
