@@ -209,8 +209,15 @@ Client.prototype.after = function (fn, opts = {}) {
 }
 
 Client.prototype.prepare = function (service, method, data) {
-  return (callback) => {
-    this.call(service, method, data, callback)
+  return (_data, callback) => {
+    if (typeof _data === 'function') {
+      callback = _data
+      _data = undefined
+    }
+    if (typeof _data === 'undefined') {
+      _data = data
+    }
+    this.call(service, method, _data, callback)
   }
 }
 

@@ -760,6 +760,26 @@ describe("Client", function() {
 
         });
 
+        it("should allow passing data to the prepared function", function (done) {
+            let services = {
+                s1: mockTransport({
+                    call(method, data, callback) {
+                        assert.deepEqual(data, _data);
+                        return callback(null, _data2)
+                    }
+                })()
+            }
+
+            let client = new Client(services);
+
+            let prepared = client.prepare('s1', 'method');
+
+            prepared(_data, function (err, response) {
+                assert.ifError(err)
+                assert.deepEqual(response, _data2)
+                return done()
+            })
+        });
     });
 
     describe("chain", function() {
