@@ -46,6 +46,7 @@
     "bluebird": "^3.4.1",
     "clone": "^1.0.2",
     "ht-http-transport": "^1.0.2",
+    "ht-jsonrpc-http-transport": "^1.0.0",
     "ht-schema": "^3.2.0",
     "ht-tcp-transport": "^1.0.0",
     "ht-utils": "^1.0.0"
