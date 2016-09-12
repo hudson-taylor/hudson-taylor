@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "6.3.5",
+  "version": "6.3.6",
   "description": "Hudson Taylor is a set of libraries for making awesome microservices",
   "main": "index.js",
   "directories": {
