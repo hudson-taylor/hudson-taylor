@@ -145,6 +145,33 @@ describe('Client', function () {
     })
   })
 
+  describe('getServices', function () {
+    it('should return array of services added', function () {
+      let services = {
+        'test1': mockTransport()({}),
+        'test2': mockTransport()({})
+      }
+      let client = new Client(services)
+      let serviceNames = client.getServices()
+      assert.deepEqual(serviceNames, Object.keys(services))
+    })
+  })
+
+  describe('hasService', function () {
+    it('should return true when client has service', function () {
+      let service = mockTransport()({})
+      let client = new Client({
+        myService: service
+      })
+      assert.equal(client.hasService('myService'), true)
+    })
+
+    it("should return false when client doesn't have service", function () {
+      let client = new Client()
+      assert.equal(client.hasService('myService'), false)
+    })
+  })
+
   describe('call', function () {
     it('should return error if calling unknown service', function (done) {
       let client = new Client({})

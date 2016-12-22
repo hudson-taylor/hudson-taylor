@@ -41,6 +41,14 @@ Client.prototype.add = function (name, transport) {
   this.emit('added', name)
 }
 
+Client.prototype.getServices = function () {
+  return Object.keys(this.services)
+}
+
+Client.prototype.hasService = function (name) {
+  return !!~this.getServices().indexOf(name)
+}
+
 Client.prototype.addSchema = function (service, method, schema) {
   if (!this.schemas[service]) {
     this.schemas[service] = {}
