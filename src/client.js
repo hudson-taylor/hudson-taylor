@@ -7,6 +7,9 @@ const async = require('async')
 const bluebird = require('bluebird')
 const utils = require('ht-utils')
 
+const Service = require('./service')
+const LocalTransport = require('./transports').Local
+
 let Client = function Client (services) {
   if (!(this instanceof Client)) {
     return new Client(services)
@@ -34,6 +37,11 @@ util.inherits(Client, events.EventEmitter)
 Client.prototype.add = function (name, transport) {
   if (this.services[name]) {
     throw new Error('Tried adding a service with duplicate name')
+  }
+  if (transport instanceof Service) {
+    let service = transport
+    transport = new LocalTransport()
+    service.addTransport(transport)
   }
   this.services[name] = transport
   let client = new transport.Client()
