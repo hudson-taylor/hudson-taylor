@@ -8,6 +8,7 @@ node_js:
 - '7'
 script: npm run coverage
 after_success: npm run push-coverage
+cache: yarn
 notifications:
   irc: chat.freenode.net#htjs
   slack:
