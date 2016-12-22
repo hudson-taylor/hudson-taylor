@@ -4,6 +4,8 @@ node_js:
 - '0.12'
 - '4'
 - '5'
+- '6'
+- '7'
 script: npm run coverage
 after_success: npm run push-coverage
 notifications:
