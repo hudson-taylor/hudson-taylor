@@ -9,10 +9,10 @@
   },
   "scripts": {
     "pretest": "standard | snazzy",
-    "test": "./node_modules/.bin/mocha -r babel-register --recursive --reporter spec --bail --check-leaks",
-    "build": "./node_modules/.bin/babel src -d lib",
-    "coverage": "./node_modules/.bin/nyc --reporter=lcov npm test",
-    "push-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test": "mocha -r babel-register --recursive --reporter spec --bail --check-leaks",
+    "build": "babel src -d lib",
+    "coverage": "nyc --reporter=lcov npm test",
+    "push-coverage": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run build"
   },
   "repository": {
