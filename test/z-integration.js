@@ -21,11 +21,13 @@ describe('Integrations', function () {
     })
 
     client.call('s', 'hello', function (err, result) {
-      if (err) {
-        // appease eslint
-      }
-      countCalled++
-      throw Error('oops')
+      return new Promise(function (resolve, reject) {
+        if (err) {
+          // appease eslint
+        }
+        countCalled++
+        throw Error('oops')
+      })
     })
 
     setTimeout(function () {
