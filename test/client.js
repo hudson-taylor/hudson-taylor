@@ -5,6 +5,7 @@ const s = require('ht-schema')
 const bluebird = require('bluebird')
 
 const Client = require('../src/client')
+const Service = require('../src/service')
 
 const _data = {
   hello: 'world'
@@ -142,6 +143,13 @@ describe('Client', function () {
       let countBefore = Object.keys(client.connections).length
       client.add('test3', mockTransport()({}))
       assert.equal(Object.keys(client.connections).length, countBefore + 1)
+    })
+
+    it('should allow adding a service directly', function () {
+      let client = new Client()
+      let service = new Service()
+      client.add('myService', service)
+      assert.deepEqual(Object.keys(client.connections), [ 'myService' ])
     })
   })
 
