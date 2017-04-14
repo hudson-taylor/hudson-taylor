@@ -42,12 +42,12 @@
   },
   "homepage": "https://github.com/hudson-taylor/hudson-taylor",
   "dependencies": {
-    "async": "^2.0.1",
-    "bluebird": "^3.4.1",
-    "clone": "^1.0.2",
+    "async": "^2.3.0",
+    "bluebird": "^3.5.0",
+    "clone": "^2.1.1",
     "ht-http-transport": "^1.0.2",
     "ht-jsonrpc-http-transport": "^1.0.0",
-    "ht-schema": "^3.2.0",
+    "ht-schema": "^3.3.0",
     "ht-tcp-transport": "^1.0.0",
     "ht-utils": "^1.0.0"
   },
