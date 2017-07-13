@@ -1562,9 +1562,9 @@ hosted-git-info@^2.1.4:
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.1.5.tgz#0ba81d90da2e25ab34a332e6ec77936e1598118b"
 
-ht-http-transport@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ht-http-transport/-/ht-http-transport-1.0.2.tgz#0e3f9af29eccae1a18015a2ca123ab220140ef6a"
+ht-http-transport@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/ht-http-transport/-/ht-http-transport-1.0.3.tgz#e0ee0e79554545252ba2d1284d009aca262f0519"
   dependencies:
     body-parser "^1.15.0"
     cors "^2.7.1"
