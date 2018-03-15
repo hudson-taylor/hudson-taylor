@@ -347,6 +347,26 @@ describe('Client', function () {
         return done()
       })
     })
+
+    it('should pass extra options', function (done) {
+      let services = {
+        s1: mockTransport({
+          call (method, data, callback, opts) {
+            return callback(null, opts)
+          }
+        })()
+      }
+
+      let client = new Client(services)
+
+      client.call('s1', 'test', {}, function (err, data) {
+        assert.ifError(err)
+        assert.equal(data.myOption, 'something')
+        return done()
+      }, {
+        myOption: 'something'
+      })
+    })
   })
 
   describe('middleware', function () {
