@@ -92,7 +92,7 @@ Client.prototype.disconnect = function (done) {
   }, done)
 }
 
-Client.prototype.call = function (service, method, data, callback) {
+Client.prototype.call = function (service, method, data, callback, opts = {}) {
   let context = {
     service,
     method
@@ -198,7 +198,7 @@ Client.prototype.call = function (service, method, data, callback) {
           return finish(data)
         }
       })
-    })
+    }, opts)
   })
 
   if (returnPromise) {
