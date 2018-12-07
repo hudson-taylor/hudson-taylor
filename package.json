@@ -1,6 +1,6 @@
 {
   "name": "hudson-taylor",
-  "version": "6.4.3",
+  "version": "6.4.4",
   "description": "Hudson Taylor is a set of libraries for making awesome microservices",
   "main": "index.js",
   "directories": {
@@ -45,7 +45,7 @@
     "async": "^2.3.0",
     "bluebird": "^3.5.0",
     "clone": "^2.1.1",
-    "ht-http-transport": "^1.0.6",
+    "ht-http-transport": "^1.0.7",
     "ht-jsonrpc-http-transport": "^1.0.0",
     "ht-schema": "^3.3.0",
     "ht-tcp-transport": "^1.0.0",
